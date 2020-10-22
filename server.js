@@ -4,10 +4,9 @@ const cors = require('cors');
 const path = require('path');
 
 const configEnv = require('./config.env');
-// const contactsRouter = require('./routers/contactsRouter');
-// const usersRouter = require('./routers/usersRouter');
+const {} = require('./routers');
 
-const { mailer } = require('./helpers');
+const { mailer, ApiError } = require('./helpers');
 const connection = require('./database/Connection');
 
 module.exports = class ContactsServer {
@@ -39,8 +38,11 @@ module.exports = class ContactsServer {
   }
 
   initRoutes() {
-    this.server.use('/', express.static(path.join(__dirname, 'public')));
-    // this.server.use('/api/contacts', contactsRouter);
+    this.server.use('/', () => {
+      throw new ApiError(404, 'Not found', {
+        message: 'Not authorized',
+      });
+    }); //express.static(path.join(__dirname, 'public')));
     // this.server.use('/api/users', usersRouter);
   }
 
