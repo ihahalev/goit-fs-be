@@ -9,6 +9,7 @@ module.exports = {
   jwtPrivateKey: process.env.TOKEN_PRIVATE_KEY,
   srvUrl: `${process.env.SRV_URL}:${process.env.PORT}`,
   imgUrl: `${process.env.SRV_URL}:${process.env.PORT}/images/`,
+  allowedOrigin: `${process.env.HOST_URL}:${process.env.HOST_PORT}`,
 
   paths: {
     tmp: path.join(process.cwd(), 'tmp'),

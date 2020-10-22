@@ -9,7 +9,7 @@ const {} = require('./routers');
 const { mailer, ApiError } = require('./helpers');
 const connection = require('./database/Connection');
 
-module.exports = class ContactsServer {
+module.exports = class Server {
   constructor() {
     this.server = null;
   }
@@ -34,7 +34,7 @@ module.exports = class ContactsServer {
   initMiddlewares() {
     this.server.use(morgan('tiny'));
     this.server.use(express.json());
-    this.server.use(cors());
+    this.server.use(cors({ origin: configEnv.allowedOrigin }));
   }
 
   initRoutes() {
