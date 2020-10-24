@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 
 const configEnv = require('./config.env');
-const {} = require('./routers');
+const { userRouter } = require('./routers');
 
 const { mailer, ApiError } = require('./helpers');
 const connection = require('./database/Connection');
@@ -43,7 +43,7 @@ module.exports = class Server {
         message: 'Not authorized',
       });
     }); //express.static(path.join(__dirname, 'public')));
-    // this.server.use('/api/users', usersRouter);
+    this.server.use('/api/auth', userRouter);
   }
 
   startListening() {
