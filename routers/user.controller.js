@@ -1,4 +1,4 @@
-const userModel = require("./user.model");
+const userModel = require("../database/modules/user/user.model");
 const bcrypt = require("bcrypt");
 const Joi = require("@hapi/joi");
 const { v4: uuidv4 } = require("uuid");

@@ -1,1 +1,1 @@
-exports.userRouter = require("./index");
+exports.userRouter = require("./usersRouter");

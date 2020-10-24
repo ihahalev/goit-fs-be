@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const joi = require("joi");
 const jsonWebToken = require("jsonwebtoken");
-const config = require("../config.env");
+const config = require("../../../config.env");
 
 const UserSchema = new mongoose.Schema({
   username: { type: String, required: true },

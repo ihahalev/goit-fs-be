@@ -43,7 +43,7 @@ module.exports = class Server {
         message: 'Not authorized',
       });
     }); //express.static(path.join(__dirname, 'public')));
-    this.server.use('/api/auth', userRouter);
+    this.server.use('api/users', userRouter);
   }
 
   startListening() {
