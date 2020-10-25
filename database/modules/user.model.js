@@ -38,7 +38,7 @@ UserSchema.static("hashPassword", (password) => {
 });
 
 UserSchema.method("isPasswordValid", function (password) {
-  return password.compare(password, this.passwordHash);
+  return bcrypt.compare(password, this.passwordHash);
 });
 
 UserSchema.method("generateAndSaveToken", async function () {
