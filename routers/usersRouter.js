@@ -1,6 +1,6 @@
 const express = require("express");
 const userController = require("./user.controller");
-
+const authorization = require('../middlewares/auth');
 const userRouter = express.Router();
 
 userRouter.post(
@@ -16,7 +16,7 @@ userRouter.post(
 );
 
 userRouter.get(
-  "/auth/verify/:verificationToken",
+  "/verify/:verificationToken",
   userController.verifyEmail
 );
 
