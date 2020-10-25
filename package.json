@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/ihahalev/goit-nodejs#readme",
   "devDependencies": {
+    "bcrypt": "^5.0.0",
     "faker": "^5.1.0",
     "jest": "^26.6.0",
     "joi": "^17.3.0",
@@ -43,7 +44,8 @@
     "swagger-ui-express": "^4.1.4"
   },
   "dependencies": {
-    "@sendgrid/mail": "^7.3.0",
+    "@hapi/joi": "^17.1.1",
+    "@sendgrid/mail": "^7.2.6",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",

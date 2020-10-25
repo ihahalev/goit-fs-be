@@ -4,19 +4,17 @@ const cors = require('cors');
 const path = require('path');
 
 const configEnv = require('./config.env');
-// const contactsRouter = require('./routers/contactsRouter');
-// const usersRouter = require('./routers/usersRouter');
+const { usersRouter } = require('./routers');
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./docs/index');
 
 const { familiesRouter, giftsRoutrer } = require('./routers');
 
-const { mailer } = require('./helpers');
-
+const { mailer, ApiError } = require('./helpers');
 const connection = require('./database/Connection');
 
-module.exports = class ContactsServer {
+module.exports = class Server {
   constructor() {
     this.server = null;
   }
@@ -41,7 +39,7 @@ module.exports = class ContactsServer {
   initMiddlewares() {
     this.server.use(morgan('tiny'));
     this.server.use(express.json());
-    this.server.use(cors());
+    this.server.use(cors({ origin: configEnv.allowedOrigin }));
     this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   }
 
@@ -54,6 +52,7 @@ module.exports = class ContactsServer {
 
     this.server.use('/api/families', familiesRouter);
     this.server.use('/api/gifts', giftsRoutrer);
+    this.server.use('/api/users', usersRouter);
   }
 
   startListening() {

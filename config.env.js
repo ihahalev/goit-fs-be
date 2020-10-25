@@ -10,6 +10,7 @@ module.exports = {
   jwtPrivateKey: process.env.TOKEN_PRIVATE_KEY,
   srvUrl: `${process.env.SRV_URL}:${process.env.PORT}`,
   imgUrl: `${process.env.SRV_URL}:${process.env.PORT}/images/`,
+  allowedOrigin: `${process.env.HOST_URL}:${process.env.HOST_PORT}`,
 
   sendGridApiKey: process.env.SENDGRID_API_KEY,
   nodeMailerUser: process.env.NODEMAILER_USER,
