@@ -91,7 +91,7 @@ class Mailer {
       from: config.mail.auth.user,
       to: userEmail,
       subject: "Verification Email",
-      html: `<a href="${config.srvUrl}/api/users/auth/verify/${token}">Verify email</a>`,
+      html: `<a href="${config.srvUrl}/api/auth/verify/${token}">Verify email</a>`,
     });
   }
 }
