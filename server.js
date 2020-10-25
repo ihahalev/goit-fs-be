@@ -38,11 +38,6 @@ module.exports = class Server {
   }
 
   initRoutes() {
-    // this.server.use('/', () => {
-    //   throw new ApiError(404, 'Not found', {
-    //     message: 'Not authorized',
-    //   });
-    // });
     this.server.use('/', express.static(path.join(__dirname, 'public')));
     this.server.use('/api/auth', usersRouter);
   }
