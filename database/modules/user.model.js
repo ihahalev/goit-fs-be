@@ -53,9 +53,9 @@ UserSchema.method("generateAndSaveToken", async function () {
   return token;
 });
 
-UserSchema.pre("save", function () {
+UserSchema.pre("save", async function () {
   if (this.isNew) {
-    this.passwordHash = this.constructor.hashPassword(this.passwordHash);
+    this.passwordHash = await this.constructor.hashPassword(this.passwordHash);
   }
 });
 
