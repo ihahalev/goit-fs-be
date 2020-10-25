@@ -44,7 +44,7 @@ module.exports = class Server {
     //   });
     // });
     this.server.use('/', express.static(path.join(__dirname, 'public')));
-    this.server.use('/api/users', usersRouter);
+    this.server.use('/api/auth', usersRouter);
   }
 
   startListening() {
