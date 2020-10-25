@@ -48,9 +48,8 @@ class userController {
       if (foundUser.verificationToken) {
         throw new ApiError(412, 'Email not verified');
       }
-
-      if (!foundUser.isPasswordValid(password))
-        throw new ApiError(401, 'Email or password is wrong');
+      const isValid = await foundUser.isPasswordValid(password);
+      if (!isValid) throw new ApiError(401, 'Email or password is wrong');
 
       const token = await foundUser.generateAndSaveToken();
 

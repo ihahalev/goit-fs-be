@@ -39,7 +39,7 @@ module.exports = class Server {
 
   initRoutes() {
     this.server.use('/', express.static(path.join(__dirname, 'public')));
-    this.server.use('/api/user', usersRouter);
+    this.server.use('/api/users', usersRouter);
   }
 
   startListening() {

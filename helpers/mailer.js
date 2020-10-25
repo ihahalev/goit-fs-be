@@ -24,7 +24,7 @@ class Mailer {
       from: config.mail.auth.user,
       to: userEmail,
       subject: 'Verification Email',
-      html: `<a href="${config.srvUrl}/api/user/verify/${token}">Verify email</a>`,
+      html: `<a href="${config.srvUrl}/api/users/verify/${token}">Verify email</a>`,
     });
   }
 }
