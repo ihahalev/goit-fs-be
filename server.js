@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 
 const configEnv = require('./config.env');
-const {} = require('./routers');
+const { usersRouter, transactionsRouter } = require('./routers');
 
 const { mailer, ApiError } = require('./helpers');
 const connection = require('./database/Connection');
@@ -27,6 +27,10 @@ module.exports = class Server {
     return retListen;
   }
 
+  async close() {
+    await connection.close();
+  }
+
   initServer() {
     this.server = express();
   }
@@ -38,12 +42,14 @@ module.exports = class Server {
   }
 
   initRoutes() {
-    this.server.use('/', () => {
-      throw new ApiError(404, 'Not found', {
-        message: 'Not authorized',
-      });
-    }); //express.static(path.join(__dirname, 'public')));
-    // this.server.use('/api/users', usersRouter);
+    // this.server.use('/', () => {
+    //   throw new ApiError(404, 'Not found', {
+    //     message: 'Not authorized',
+    //   });
+    // });
+    this.server.use('/', express.static(path.join(__dirname, 'public')));
+    this.server.use('/api/users', usersRouter);
+    this.server.use('/api/transactions', transactionsRouter);
   }
 
   startListening() {

@@ -29,7 +29,7 @@ class Connection {
   }
 
   async close() {
-    mongoose.connection.close();
+    await mongoose.connection.close();
   }
 }
 

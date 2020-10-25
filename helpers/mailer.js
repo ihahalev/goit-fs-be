@@ -7,23 +7,23 @@ class Mailer {
   constructor() {
     this.logger = getLogger('mailer');
     //nodemailer direct sender
-    // this._transport = nodemailer.createTransport(configEnv.mail);
+    this._transport = nodemailer.createTransport(configEnv.mail);
 
     //smtp nodemailer + sendgrid
-    this.transporter = nodemailer.createTransport(configEnv.smtp);
+    // this.transporter = nodemailer.createTransport(configEnv.smtp);
   }
 
   async init() {
     this.logger.info('Creating transporter');
 
     //nodemailer direct sender
-    // await this._transport;
+    await this._transport;
 
     //sendgrid API
     // sgMail.setApiKey(configEnv.mail.SGKey);
 
     //smtp nodemailer + sendgrid
-    await this.transporter;
+    // await this.transporter;
   }
 
   async sendMailFromSupport({ to, subject, text, html }) {
@@ -34,13 +34,13 @@ class Mailer {
     html && this.logger.debug('html ->', html);
 
     //nodemailer direct sender
-    // return this._transport.sendMail({
-    //   from: configEnv.mail.auth.user,
-    //   to: Array.isArray(to) ? to.join(', ') : to,
-    //   subject,
-    //   text,
-    //   html,
-    // });
+    return this._transport.sendMail({
+      from: configEnv.mail.auth.user,
+      to: Array.isArray(to) ? to.join(', ') : to,
+      subject,
+      text,
+      html,
+    });
 
     //sendgrid API
     // return sgMail.send({
@@ -52,13 +52,13 @@ class Mailer {
     // });
 
     //smtp nodemailer + sendgrid
-    return this.transporter.sendMail({
-      from: `"Support" <${configEnv.mail.SGUser}>`,
-      to: Array.isArray(to) ? to.join(', ') : to,
-      subject,
-      text,
-      html,
-    });
+    // return this.transporter.sendMail({
+    //   from: `"Support" <${configEnv.mail.SGUser}>`,
+    //   to: Array.isArray(to) ? to.join(', ') : to,
+    //   subject,
+    //   text,
+    //   html,
+    // });
   }
 
   async sendText({ to, subject, text }) {
