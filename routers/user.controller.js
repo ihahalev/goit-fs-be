@@ -73,12 +73,7 @@ class userController {
         throw new ApiError(428, "Email not verified");
       }
 
-      const isPasswordValid = await bcrypt.compare(
-        password,
-        foundUser.passwordHash
-      );
-
-      if (!isPasswordValid)
+      if (!foundUser.isPasswordValid(password))
         throw new ApiError(401, "Email or password is wrong");
 
       const token = await foundUser.generateAndSaveToken();
