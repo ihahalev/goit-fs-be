@@ -23,8 +23,8 @@ const UserSchema = new mongoose.Schema(
     familyId: { type: ObjectId, default: null },
     tokens: [
       {
-        token: { type: String, require: true },
-        expires: { type: Date, require: true },
+        token: { type: String, required: true },
+        expires: { type: Date, required: true },
       },
     ],
     verificationToken: { type: String },
