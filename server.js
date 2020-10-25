@@ -28,7 +28,7 @@ module.exports = class Server {
   }
 
   async close() {
-    await connection.close();
+    return connection.close;
   }
 
   initServer() {

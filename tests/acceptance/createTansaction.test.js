@@ -14,15 +14,15 @@ const userModel = require('../types/userModel');
 describe('POST /api/transactions', () => {
   let server;
   let token;
+  const financeServer = new Server();
 
   before(async () => {
-    const financeServer = new Server();
-    server = await financeServer.start().catch(console.error);
+    server = await financeServer.start();
   });
 
   after(async () => {
     sinon.restore();
-    await server.close();
+    await mongoose.connection.close();
     // process.exit(0);
   });
 

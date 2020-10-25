@@ -16,4 +16,10 @@ router.get(
   transactionsController.getCategories,
 );
 
+// router.get(
+//   '/collect',
+
+//   transactionsController.collect,
+// );
+
 module.exports = router;

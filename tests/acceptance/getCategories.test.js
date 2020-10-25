@@ -3,6 +3,7 @@ const should = require('should');
 const sinon = require('sinon');
 const jwt = require('jsonwebtoken');
 const faker = require('faker');
+const mongoose = require('mongoose');
 
 const Server = require('../../server');
 const TransactionModel = require('../../database/models/TransactionModel');
@@ -13,15 +14,15 @@ const userModel = require('../types/userModel');
 describe('GET /api/transactions/categories', () => {
   let server;
   let token;
+  const financeServer = new Server();
 
   before(async () => {
-    const financeServer = new Server();
-    server = await financeServer.start().catch(console.error);
+    server = await financeServer.start();
   });
 
   after(async () => {
     sinon.restore();
-    await server.close();
+    await mongoose.connection.close();
     // process.exit(0);
   });
 
@@ -57,6 +58,7 @@ describe('GET /api/transactions/categories', () => {
       );
       const res = await supertest(server)
         .get('/api/transactions/categories')
+        .set('Authorization', token)
         .set('Content-Type', 'application/json')
         .expect(200);
 
