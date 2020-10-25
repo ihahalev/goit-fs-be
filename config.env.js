@@ -3,12 +3,17 @@ const path = require('path');
 
 module.exports = {
   port: process.env.PORT,
+  sectetKey: process.env.PROTECT_KEY,
   dbConnectionUrl: process.env.DB_URL,
   dbName: process.env.DB_NAME,
   dbCollection: process.env.DB_COLLECTION,
   jwtPrivateKey: process.env.TOKEN_PRIVATE_KEY,
   srvUrl: `${process.env.SRV_URL}:${process.env.PORT}`,
   imgUrl: `${process.env.SRV_URL}:${process.env.PORT}/images/`,
+
+  sendGridApiKey: process.env.SENDGRID_API_KEY,
+  nodeMailerUser: process.env.NODEMAILER_USER,
+  nodeMailerPass: process.env.NODEMAILER_PASS,
 
   paths: {
     tmp: path.join(process.cwd(), 'tmp'),
@@ -35,5 +40,10 @@ module.exports = {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
+  },
+
+  swagger: {
+    host: `${process.env.SRV_URL}:${process.env.PORT}`,
+    schemes: ['https'],
   },
 };
