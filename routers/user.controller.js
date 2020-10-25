@@ -141,7 +141,7 @@ class userController {
         req.body
       );
 
-      const { name, email, passwordHash } = req.body;
+      const { name, email, password } = req.body;
 
       const [user] = await UserModel.find({ email });
 
