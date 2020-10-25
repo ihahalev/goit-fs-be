@@ -154,7 +154,7 @@ class userController {
       await UserModel.create({
         name,
         email,
-        passwordHash,
+        passwordHash: password,
         verificationToken,
       });
 
@@ -199,7 +199,7 @@ class userController {
 
       const token = await foundUser.generateAndSaveToken();
 
-      const { _id, email: userEmail } = foundUser;
+      const { _id, email: userEmail, familyId } = foundUser;
       res.send({ _id, userEmail, familyId, activeToken: token });
     } catch (err) {
       errorHandler(req, res, err);
