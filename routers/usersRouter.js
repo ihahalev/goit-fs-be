@@ -5,14 +5,19 @@ const userRouter = express.Router();
 
 userRouter.post(
   "/sign-up",
-  userController.validateUserObject,
+  // userController.validateUserObject,
   userController.userRegister
 );
 
 userRouter.post(
   "/sign-in",
-  userController.validateUserObject,
+  // userController.validateUserObject,
   userController.userLogin
+);
+
+userRouter.get(
+  "/auth/verify/:verificationToken",
+  userController.verifyEmail
 );
 
 module.exports = userRouter;

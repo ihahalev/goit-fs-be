@@ -2,32 +2,35 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const joi = require("joi");
 const jsonWebToken = require("jsonwebtoken");
-const config = require("../../../config.env");
+const config = require("../../config.env");
+const { Timestamp, ObjectId } = require("mongodb");
 
-const UserSchema = new mongoose.Schema({
-  username: { type: String, required: true },
-  email: {
-    type: String,
-    unique: true,
-    validate: {
-      validator(email) {
-        const { error } = joi.string().email().validate(email);
+const UserSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    email: {
+      type: String,
+      unique: true,
+      validate: {
+        validator(email) {
+          const { error } = joi.string().email().validate(email);
 
-        if (error) throw new Error("Email not vlid");
+          if (error) throw new Error("Email not vlid");
+        },
       },
     },
+    passwordHash: { type: String },
+    familyId: { type: ObjectId, default: null },
+    tokens: [
+      {
+        token: { type: String, require: true },
+        expires: { type: Date, require: true },
+      },
+    ],
+    verificationToken: { type: String },
   },
-  passwordHash: { type: String },
-  familyId: {},
-  tokens: [
-    {
-      token: { type: String, require: true },
-      expires: { type: Date, require: true },
-    },
-  ],
-  createdAt: { type: Date, default: () => Date.now() },
-  updatedAt: Date,
-});
+  { timestamps: true }
+);
 
 UserSchema.static("hashPassword", (password) => {
   const costFactor = 6;

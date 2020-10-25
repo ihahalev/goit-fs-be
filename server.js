@@ -1,13 +1,13 @@
-const express = require('express');
-const morgan = require('morgan');
-const cors = require('cors');
-const path = require('path');
+const express = require("express");
+const morgan = require("morgan");
+const cors = require("cors");
+const path = require("path");
 
-const configEnv = require('./config.env');
-const { userRouter } = require('./routers');
+const configEnv = require("./config.env");
+const { usersRouter } = require("./routers");
 
-const { mailer, ApiError } = require('./helpers');
-const connection = require('./database/Connection');
+const { mailer, ApiError } = require("./helpers");
+const connection = require("./database/Connection");
 
 module.exports = class Server {
   constructor() {
@@ -15,13 +15,13 @@ module.exports = class Server {
   }
 
   async start() {
-    await mailer.init();
+    // await mailer.init();
     await connection.connect();
     this.initServer();
     this.initMiddlewares();
     this.initRoutes();
     const retListen = this.startListening();
-    process.on('SIGILL', () => {
+    process.on("SIGILL", () => {
       connection.close();
     });
     return retListen;
@@ -32,18 +32,19 @@ module.exports = class Server {
   }
 
   initMiddlewares() {
-    this.server.use(morgan('tiny'));
+    this.server.use(morgan("tiny"));
     this.server.use(express.json());
     this.server.use(cors({ origin: configEnv.allowedOrigin }));
   }
 
   initRoutes() {
-    this.server.use('/', () => {
-      throw new ApiError(404, 'Not found', {
-        message: 'Not authorized',
-      });
-    }); //express.static(path.join(__dirname, 'public')));
-    this.server.use('api/users', userRouter);
+    // this.server.use('/', () => {
+    //   throw new ApiError(404, 'Not found', {
+    //     message: 'Not authorized',
+    //   });
+    // });
+    this.server.use('/', express.static(path.join(__dirname, 'public')));
+    this.server.use('/api/users', usersRouter);
   }
 
   startListening() {
@@ -52,7 +53,7 @@ module.exports = class Server {
         return console.error(err);
       }
 
-      console.info('server started at port', configEnv.port);
+      console.info("server started at port", configEnv.port);
     });
   }
 };
