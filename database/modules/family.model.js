@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 
-const FamilieSchema = new Schema({
+const familySchema = new Schema({
   usersId: { type: Schema.Types.ObjectId, default: null, ref: 'User' },
   balance: { type: Number, default: 0, required: false },
   flatPrice: { type: Number, default: 0, required: true },
@@ -16,19 +16,19 @@ const FamilieSchema = new Schema({
   { timestamps: true }
 );
 
-FamilieSchema.method("decrementGiftsForUnpacking", function () {
+familySchema.method("decrementGiftsForUnpacking", function () {
   this.giftsForUnpacking = this.giftsForUnpacking - 1;
 
   return this.giftsForUnpacking;
 });
 
-FamilieSchema.method("incrementGiftsUnpacked", function () {
+familySchema.method("incrementGiftsUnpacked", function () {
   this.giftsUnpacked = this.giftsUnpacked + 1;
 
   return this.giftsUnpacked;
 });
 
-FamilieSchema.pre("save", function () {
+familySchema.pre("save", function () {
   if (this.isNew) {
     this.giftsForUnpacking = this.constructor.decrementGiftsForUnpacking(this.giftsForUnpacking);
 
@@ -36,4 +36,4 @@ FamilieSchema.pre("save", function () {
   }
 });
 
-module.exports = mongoose.model("Familie", FamilieSchema);
+module.exports = mongoose.model("Familie", familySchema);

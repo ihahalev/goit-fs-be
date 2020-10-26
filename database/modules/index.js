@@ -1,3 +1,3 @@
-exports.FamilieModel = require("./familie.model");
-exports.UserModel = require("./user.model");
+exports.familyModel = require("./family.model");
+exports.userModel = require("./user.model");
 

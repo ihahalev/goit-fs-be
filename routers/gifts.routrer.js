@@ -5,7 +5,7 @@ const giftsController = require('./gifts.controller');
 const authorization = require('../middlewares/auth');
 
 giftsRouter.put("/unpack", authorization,
-  giftsController.updateGifts,
+  giftsController.unpackGift,
 );
 
 module.exports = giftsRouter;

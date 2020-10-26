@@ -1,6 +1,6 @@
 
 const Joi = require('Joi');
-const { FamilieModel, UserModel } = require('../database/modules');
+const { familyModel } = require('../database/modules');
 const { ApiError, errorHandler, validate, getLogger } = require('../helpers');
 
 const logger = getLogger("FamiliesController");
@@ -28,7 +28,7 @@ class familyController {
     return this._createFamily.bind(this);
   }
 
-  get currentFamily() {
+  get getCurrentFamily() {
     return this._currentFamily.bind(this);
   }
 
@@ -49,7 +49,7 @@ class familyController {
 
       const { totalSalary, passiveIncome, incomePercentageToSavings, balance, flatPrice, flatSquareMeters } = req.body;
 
-      const createdFamily = await FamilieModel.create(req.body);
+      const createdFamily = await familyModel.create(req.body);
 
       createdFamily.usersId = id;
       createdFamily.save();
@@ -84,7 +84,7 @@ class familyController {
         });
       }
 
-      const currentFamily = await FamilieModel.findById(familyId)
+      const currentFamily = await familyModel.findById(familyId)
 
       const { totalSalary, passiveIncome, incomePercentageToSavings, flatPrice, flatSquareMeters } = currentFamily;
 
@@ -115,7 +115,7 @@ class familyController {
         });
       }
 
-      const user = await UserModel.findById(userId);
+      const user = await u.findById(userId);
 
       if (!user) {
         throw new ApiError(404, "user is not authorized", {
@@ -123,7 +123,7 @@ class familyController {
         });
       }
 
-      const familyToUpdate = await FamilieModel.findByIdAndUpdate(familyId, req.body)
+      const familyToUpdate = await familyModel.findByIdAndUpdate(familyId, req.body)
 
       const { flatPrice, flatSquareMeters, totalSalary,
         passiveIncome, incomePercentageToSavings } = familyToUpdate;

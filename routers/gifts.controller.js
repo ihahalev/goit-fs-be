@@ -1,5 +1,5 @@
 const Joi = require('Joi');
-const { FamilieModel } = require('../database/modules');
+const { familyModel } = require('../database/modules');
 const { ApiError, errorHandler, getLogger } = require('../helpers');
 
 const logger = getLogger("gifts");
@@ -7,11 +7,11 @@ const logger = getLogger("gifts");
 class giftsController {
   constructor() { }
 
-  get updateGifts() {
-    return this._updateGifts.bind(this);
+  get unpackGift() {
+    return this._unpackGift.bind(this);
   }
 
-  async _updateGifts(req, res) {
+  async _unpackGift(req, res) {
     try {
 
       const { verificationToken, familyId } = req.user;
@@ -24,12 +24,12 @@ class giftsController {
         throw new ApiError(403, "user not a member of family");
       }
 
-      const family = await FamilieModel.findById(familyId)
+      const family = await familyModel.findById(familyId)
 
-      const familyUpdate = await FamilieModel.findByIdAndUpdate(familyId, {
+      const familyUpdate = await familyModel.findByIdAndUpdate(familyId, {
         giftsForUnpacking: family.decrementGiftsForUnpacking(),
         giftsUnpacked: family.incrementGiftsUnpacked(),
-      })
+      }, { new: true })
 
       const { giftsForUnpacking } = familyUpdate;
 

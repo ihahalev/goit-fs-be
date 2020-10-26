@@ -9,7 +9,7 @@ familiesRouter.post("/", authorization,
 );
 
 familiesRouter.get("/current", authorization,
-  familiesController.currentFamily,
+  familiesController.getCurrentFamily,
 );
 
 familiesRouter.put("/", authorization,

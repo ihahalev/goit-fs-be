@@ -1,4 +1,4 @@
 
 exports.familiesRouter = require("./families.router");
-exports.giftsRoutrer = require("./gifts.routrer");
+exports.giftsRouter = require("./gifts.routrer");
 exports.usersRouter = require('./user.router');
