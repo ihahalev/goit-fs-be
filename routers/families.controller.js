@@ -1,6 +1,6 @@
 
 const Joi = require('Joi');
-const { familyModel } = require('../database/modules');
+const { familyModel, userModel } = require('../database/modules');
 const { ApiError, errorHandler, validate, getLogger } = require('../helpers');
 
 const logger = getLogger("FamiliesController");
@@ -79,9 +79,7 @@ class familyController {
       const { verificationToken, familyId } = req.user;
 
       if (verificationToken) {
-        throw new ApiError(401, "unauthorized error", {
-          message: 'user is not authorized',
-        });
+        throw new ApiError(401, "unauthorized error");
       }
 
       const currentFamily = await familyModel.findById(familyId)
@@ -110,17 +108,13 @@ class familyController {
       const { _id: userId, verificationToken, familyId } = req.user;
 
       if (verificationToken) {
-        throw new ApiError(401, "unauthorized error", {
-          message: 'user is not authorized',
-        });
+        throw new ApiError(401, "user is not authorized");
       }
 
-      const user = await u.findById(userId);
+      const user = await userModel.findById(userId);
 
       if (!user) {
-        throw new ApiError(404, "user is not authorized", {
-          message: 'user is not authorized',
-        });
+        throw new ApiError(404, "user is not authorized");
       }
 
       const familyToUpdate = await familyModel.findByIdAndUpdate(familyId, req.body)
