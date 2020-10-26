@@ -1,2 +1,0 @@
-exports.FamilieModel = require("./FamilieModel");
-

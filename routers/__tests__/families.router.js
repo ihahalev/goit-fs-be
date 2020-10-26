@@ -4,7 +4,7 @@ const config = require("../../config.env");
 const { ApiError } = require("../../helpers");
 
 const request = require("supertest");
-const { FamilieModel, UserModel } = require("../../database/models");
+const { FamilieModel, UserModel } = require("../../database/modules");
 const UserServer = require("../../server");
 
 // const authCeck = require('../../middlewares/auth-check');

@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 
 const FamilieSchema = new Schema({
   usersId: { type: Schema.Types.ObjectId, default: null, ref: 'User' },
-  balance: { type: Number, default: 0, required: true },
+  balance: { type: Number, default: 0, required: false },
   flatPrice: { type: Number, default: 0, required: true },
   flatSquareMeters: { type: Number, default: 0, required: true },
   giftsUnpacked: { type: Number, default: 0 },
@@ -13,21 +13,27 @@ const FamilieSchema = new Schema({
   passiveIncome: { type: Number, default: 0, required: true },
   incomePercentageToSavings: { type: Number, default: 0, required: true },
 },
-  {
-    timestamps: true
-  }
+  { timestamps: true }
 );
 
-FamilieSchema.method("decrementGiftsForUnpacking", async function (value) {
-  this.giftsForUnpacking = this.giftsForUnpacking - value;
-  await this.save();
-  return giftsForUnpacking;
+FamilieSchema.method("decrementGiftsForUnpacking", function () {
+  this.giftsForUnpacking = this.giftsForUnpacking - 1;
+
+  return this.giftsForUnpacking;
 });
 
-FamilieSchema.method("incrementGiftsUnpacked", async function (value) {
-  this.giftsUnpacked = this.giftsUnpacked + value;
-  await this.save();
-  return giftsUnpacked;
+FamilieSchema.method("incrementGiftsUnpacked", function () {
+  this.giftsUnpacked = this.giftsUnpacked + 1;
+
+  return this.giftsUnpacked;
+});
+
+FamilieSchema.pre("save", function () {
+  if (this.isNew) {
+    this.giftsForUnpacking = this.constructor.decrementGiftsForUnpacking(this.giftsForUnpacking);
+
+    this.giftsUnpacked = this.constructor.incrementGiftsUnpacked(this.giftsUnpacked);
+  }
 });
 
 module.exports = mongoose.model("Familie", FamilieSchema);

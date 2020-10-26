@@ -7,7 +7,7 @@ const { ApiError, errorHandler, mailer } = require('../helpers');
 
 // const authRouter = Router();
 class userController {
-  constructor() {}
+  constructor() { }
   async userRegister(req, res) {
     try {
       const { name, email, password } = req.body;

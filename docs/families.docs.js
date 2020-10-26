@@ -133,13 +133,8 @@ const familyDefinitions = {
       },
       id: {
         type: 'string',
-      },
-      createdAt: {
-        type: 'string',
-      },
-      updatedAt: {
-        type: 'string',
-      },
+      }
+
     },
     xml: {
       name: 'Families',
