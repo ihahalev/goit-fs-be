@@ -6,9 +6,6 @@ const path = require('path');
 const configEnv = require('./config.env');
 const { usersRouter, familiesRouter, giftsRouter } = require('./routers');
 
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./docs/index');
-
 const { mailer, getLogger } = require('./helpers');
 const connection = require('./database/Connection');
 
@@ -19,6 +16,7 @@ module.exports = class Server {
   }
 
   async start() {
+
     await mailer.init();
     await connection.connect();
     this.initServer();
@@ -39,7 +37,6 @@ module.exports = class Server {
     this.server.use(morgan('tiny'));
     this.server.use(express.json());
     this.server.use(cors({ origin: configEnv.allowedOrigin }));
-    this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   }
 
   initRoutes() {

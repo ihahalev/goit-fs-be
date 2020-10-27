@@ -14,11 +14,7 @@ class giftsController {
   async _unpackGift(req, res) {
     try {
 
-      const { verificationToken, familyId } = req.user;
-
-      if (verificationToken) {
-        throw new ApiError(401, "unauthorized error");
-      }
+      const { familyId } = req.user;
 
       if (!familyId) {
         throw new ApiError(404, "user not a member of family");

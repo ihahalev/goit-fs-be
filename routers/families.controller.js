@@ -1,28 +1,11 @@
 
 const Joi = require('Joi');
-const { familyModel, userModel } = require('../database/modules');
-const { ApiError, errorHandler, validate, getLogger } = require('../helpers');
+const { familyModel } = require('../database/modules');
+const { ApiError, errorHandler, getLogger } = require('../helpers');
 
 const logger = getLogger("FamiliesController");
 
 class FamilyController {
-  constructor() {
-    this.validCreatedFamilyObject = Joi.object({
-      totalSalary: Joi.number().required(),
-      passiveIncome: Joi.number().required(),
-      incomePercentageToSavings: Joi.number().required(),
-      balance: Joi.number().required(),
-      flatPrice: Joi.number().required(),
-      flatSquareMeters: Joi.number().required(),
-    });
-    this.validUpdateFamilyObject = Joi.object({
-      totalSalary: Joi.number().required(),
-      passiveIncome: Joi.number().required(),
-      incomePercentageToSavings: Joi.number().required(),
-      flatPrice: Joi.number().required(),
-      flatSquareMeters: Joi.number().required(),
-    });
-  }
 
   get createFamily() {
     return this._createFamily.bind(this);
@@ -39,9 +22,7 @@ class FamilyController {
   async _createFamily(req, res) {
     try {
 
-      validate(this.validCreatedFamilyObject, req.body);
-
-      const { _id: id, familyId } = req.user;
+      const { familyId } = req.user;
 
       if (familyId) {
         throw new ApiError(409, "user already created family/is a part of family");
@@ -63,23 +44,11 @@ class FamilyController {
   async _currentFamily(req, res) {
     try {
 
-      const { verificationToken, familyId } = req.user;
-
-      if (verificationToken) {
-        throw new ApiError(401, "unauthorized error");
-      }
+      const { familyId } = req.user;
 
       const currentFamily = await familyModel.findById(familyId)
 
-      const { totalSalary, passiveIncome, incomePercentageToSavings, flatPrice, flatSquareMeters } = currentFamily;
-
-      return res.status(200).send({
-        totalSalary,
-        passiveIncome,
-        incomePercentageToSavings,
-        flatPrice,
-        flatSquareMeters,
-      });
+      return res.status(200).send(currentFamily);
 
     } catch (err) {
       logger.error(err)
@@ -90,30 +59,56 @@ class FamilyController {
   async _updateFamily(req, res) {
     try {
 
-      validate(this.validUpdateFamilyObject, req.body);
-
-      const { verificationToken, familyId } = req.user;
-
-      if (verificationToken) {
-        throw new ApiError(401, "user is not authorized");
-      }
+      const { familyId } = req.user;
 
       const familyToUpdate = await familyModel.findByIdAndUpdate(familyId, req.body, { new: true })
 
-      const { flatPrice, flatSquareMeters, totalSalary,
-        passiveIncome, incomePercentageToSavings } = familyToUpdate;
-
-      return res.status(200).send({
-        totalSalary,
-        passiveIncome,
-        incomePercentageToSavings,
-        flatPrice,
-        flatSquareMeters,
-      });
+      return res.status(200).send(familyToUpdate);
 
     } catch (err) {
       logger.error(err)
       errorHandler(req, res, err);
+    }
+  };
+
+  validateCreatedFamilyObject(req, res, next) {
+    try {
+      const { error: validationError } = Joi.object({
+        totalSalary: Joi.number().required(),
+        passiveIncome: Joi.number().required(),
+        incomePercentageToSavings: Joi.number().required(),
+        balance: Joi.number().required(),
+        flatPrice: Joi.number().required(),
+        flatSquareMeters: Joi.number().required(),
+      }).validate(req.body);
+
+      if (validationError) {
+        throw new ApiError(400, 'Bad request', validationError);
+      }
+
+      next();
+    } catch (e) {
+      errorHandler(req, res, e);
+    }
+  };
+
+  validateUpdateFamilyObject(req, res, next) {
+    try {
+      const { error: validationError } = Joi.object({
+        totalSalary: Joi.number().required(),
+        passiveIncome: Joi.number().required(),
+        incomePercentageToSavings: Joi.number().required(),
+        flatPrice: Joi.number().required(),
+        flatSquareMeters: Joi.number().required(),
+      }).validate(req.body);
+
+      if (validationError) {
+        throw new ApiError(400, 'Bad request', validationError);
+      }
+
+      next();
+    } catch (e) {
+      errorHandler(req, res, e);
     }
   };
 
