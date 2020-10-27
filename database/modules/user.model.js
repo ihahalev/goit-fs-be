@@ -47,4 +47,6 @@ UserSchema.method('generateAndSaveToken', async function () {
   return token;
 });
 
+
+
 module.exports = mongoose.model('User', UserSchema);

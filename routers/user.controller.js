@@ -1,9 +1,10 @@
 // module.exports = userController;
-const Joi = require('joi');
-const bcrypt = require('bcrypt');
-const uuid = require('uuid').v4;
-const UserModel = require('../database/modules/user.model');
-const { ApiError, errorHandler, mailer } = require('../helpers');
+const Joi = require("joi");
+const bcrypt = require("bcrypt");
+const uuid = require("uuid").v4;
+const UserModel = require("../database/modules/user.model");
+const { ApiError, errorHandler, mailer } = require("../helpers");
+const userModel = require("../database/modules/user.model");
 
 // const authRouter = Router();
 class userController {
@@ -14,7 +15,7 @@ class userController {
 
       const user = await UserModel.findOne({ email });
 
-      if (user) throw new ApiError(409, 'User with such email already exist');
+      if (user) throw new ApiError(409, "User with such email already exist");
 
       const passwordHash = await UserModel.hashPassword(password);
       const verificationToken = uuid();
@@ -43,13 +44,13 @@ class userController {
       const foundUser = await UserModel.findOne({ email });
 
       if (!foundUser) {
-        throw new ApiError(401, 'Email or password is wrong');
+        throw new ApiError(401, "Email or password is wrong");
       }
       if (foundUser.verificationToken) {
-        throw new ApiError(412, 'Email not verified');
+        throw new ApiError(412, "Email not verified");
       }
       const isValid = await foundUser.isPasswordValid(password);
-      if (!isValid) throw new ApiError(401, 'Email or password is wrong');
+      if (!isValid) throw new ApiError(401, "Email or password is wrong");
 
       const token = await foundUser.generateAndSaveToken();
 
@@ -66,13 +67,13 @@ class userController {
 
       const foundUser = await UserModel.findOne({ verificationToken });
 
-      if (!foundUser) throw new ApiError(404, 'User is not found');
+      if (!foundUser) throw new ApiError(404, "User is not found");
 
       foundUser.verificationToken = null;
 
       await foundUser.save();
 
-      res.status(200).send('User is successfully verified');
+      res.status(200).send("User is successfully verified");
     } catch (err) {
       errorHandler(req, res, err);
     }
@@ -87,12 +88,23 @@ class userController {
       }).validate(req.body);
 
       if (validationError) {
-        throw new ApiError(400, 'Bad requiest', validationError);
+        throw new ApiError(400, "Bad requiest", validationError);
       }
 
       next();
     } catch (e) {
       errorHandler(req, res, e);
+    }
+  }
+
+  async userLogout(req, res) {
+    try {
+      const {name} = req.params;
+      const user = await userModel.findOne({name});
+      const contact = await userModel
+      res.send(user)
+    } catch (err) {
+      errorHandler(req, res.err);
     }
   }
 }

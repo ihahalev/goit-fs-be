@@ -15,6 +15,13 @@ userRouter.post(
   userController.userLogin,
 );
 
+userRouter.get(
+  '/sign-out/:name',
+  // authorization,
+  userController.userLogout,
+)
+
+
 userRouter.get('/verify/:verificationToken', userController.verifyEmail);
 
 module.exports = userRouter;
