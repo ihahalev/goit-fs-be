@@ -88,7 +88,7 @@ class userController {
       }).validate(req.body);
 
       if (validationError) {
-        throw new ApiError(400, "Bad requiest", validationError);
+        throw new ApiError(400, "Bad request", validationError);
       }
 
       next();
@@ -99,12 +99,17 @@ class userController {
 
   async userLogout(req, res) {
     try {
-      const {name} = req.params;
-      const user = await userModel.findOne({name});
-      const contact = await userModel
-      res.send(user)
+      const { activeToken, user } = req;
+  
+      user.tokens = user.tokens.filter(
+        (tokenRecord) => tokenRecord.token !== activeToken
+      );
+  
+      await user.save();
+  
+      res.status(204).send();
     } catch (err) {
-      errorHandler(req, res.err);
+      errorHandler(req, res, err);
     }
   }
 }

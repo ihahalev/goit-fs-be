@@ -1,27 +1,26 @@
-const express = require('express');
-const userController = require('./user.controller');
-const authorization = require('../middlewares/auth');
+const express = require("express");
+const userController = require("./user.controller");
+const authorization = require("../middlewares/auth");
 const userRouter = express.Router();
 
 userRouter.post(
-  '/sign-up',
+  "/sign-up",
   userController.validateUserObject,
-  userController.userRegister,
+  userController.userRegister
 );
 
 userRouter.post(
-  '/sign-in',
+  "/sign-in",
   userController.validateUserObject,
-  userController.userLogin,
+  userController.userLogin
 );
 
-userRouter.get(
-  '/sign-out/:name',
-  // authorization,
-  userController.userLogout,
-)
+userRouter.delete(
+  "/sign-out",
+  authorization,
+  userController.userLogout
+);
 
-
-userRouter.get('/verify/:verificationToken', userController.verifyEmail);
+userRouter.get("/verify/:verificationToken", userController.verifyEmail);
 
 module.exports = userRouter;
