@@ -1,4 +1,3 @@
-const { exampleEndpoints, exampleDefinitions } = require('./example.docs');
 const { swagger } = require('../config.env');
 const { familyDefinitions, familyEndpoints } = require('./families.docs');
 const { giftsDefinitions, giftsEndpoints } = require('./gifts.docs');
@@ -24,12 +23,10 @@ module.exports = {
   ],
   schemes: swagger.schemes,
   paths: {
-    ...exampleEndpoints,
     ...familyEndpoints,
     ...giftsEndpoints,
   },
   definitions: {
-    ...exampleDefinitions,
     ...familyDefinitions,
     ...giftsDefinitions,
   },

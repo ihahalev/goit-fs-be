@@ -5,7 +5,7 @@ const { ApiError, errorHandler, validate, getLogger } = require('../helpers');
 
 const logger = getLogger("FamiliesController");
 
-class familyController {
+class FamilyController {
   constructor() {
     this.validCreatedFamilyObject = Joi.object({
       totalSalary: Joi.number().required(),
@@ -47,25 +47,12 @@ class familyController {
         throw new ApiError(409, "user already created family/is a part of family");
       };
 
-      const { totalSalary, passiveIncome, incomePercentageToSavings, balance, flatPrice, flatSquareMeters } = req.body;
-
       const createdFamily = await familyModel.create(req.body);
-
-      createdFamily.usersId = id;
-      createdFamily.save();
 
       req.user.familyId = createdFamily._id;
       req.user.save();
 
-      return res.status(201).send({
-        balance,
-        flatPrice,
-        flatSquareMeters,
-        totalSalary,
-        passiveIncome,
-        incomePercentageToSavings,
-        id: createdFamily._id,
-      });
+      return res.status(201).send(createdFamily);
 
     } catch (err) {
       logger.error(err)
@@ -105,19 +92,13 @@ class familyController {
 
       validate(this.validUpdateFamilyObject, req.body);
 
-      const { _id: userId, verificationToken, familyId } = req.user;
+      const { verificationToken, familyId } = req.user;
 
       if (verificationToken) {
         throw new ApiError(401, "user is not authorized");
       }
 
-      const user = await userModel.findById(userId);
-
-      if (!user) {
-        throw new ApiError(404, "user is not authorized");
-      }
-
-      const familyToUpdate = await familyModel.findByIdAndUpdate(familyId, req.body)
+      const familyToUpdate = await familyModel.findByIdAndUpdate(familyId, req.body, { new: true })
 
       const { flatPrice, flatSquareMeters, totalSalary,
         passiveIncome, incomePercentageToSavings } = familyToUpdate;
@@ -138,4 +119,4 @@ class familyController {
 
 }
 
-module.exports = new familyController();
+module.exports = new FamilyController();

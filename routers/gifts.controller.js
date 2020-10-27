@@ -21,7 +21,7 @@ class giftsController {
       }
 
       if (!familyId) {
-        throw new ApiError(403, "user not a member of family");
+        throw new ApiError(404, "user not a member of family");
       }
 
       const family = await familyModel.findById(familyId)

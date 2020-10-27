@@ -8,7 +8,7 @@ const giftsEndpoints = {
       produces: ['application/json'],
       parameters: [
         {
-          in: 'body',
+          in: 'Authorization header',
           name: '',
           description: 'gifts',
           required: true,
@@ -27,9 +27,6 @@ const giftsEndpoints = {
         },
         '200': {
           description: 'decrement giftsForUnpacking & increment giftsUnpacked values',
-          schema: {
-            $ref: '#/definitions/Gifts',
-          },
         },
       },
     },
@@ -48,17 +45,7 @@ const giftsDefinitions = {
       name: 'Gifts',
     },
   },
-  GiftsRequest: {
-    type: 'object',
-    properties: {
-      giftsForUnpacking: {
-        type: 'number',
-      },
-    },
-    xml: {
-      name: 'Gifts request',
-    },
-  },
+
 };
 
 exports.giftsEndpoints = giftsEndpoints;

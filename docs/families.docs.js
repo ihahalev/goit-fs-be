@@ -8,9 +8,10 @@ const familyEndpoints = {
       produces: ['application/json'],
       parameters: [
         {
-          in: 'header',
+          in: 'body',
           name: 'families',
-          description: 'Created object families',
+          header: 'authorization',
+          description: 'Created object families. Token required',
           required: true,
           type: 'string',
           schema: {
@@ -38,15 +39,16 @@ const familyEndpoints = {
     },
     put: {
       tags: ['families'],
-      summary: 'Update info from family document',
-      description: 'families router',
+      summary: 'Update info from family document with authorization header',
+      description: '',
       operationId: 'putLoggedUser',
       produces: ['application/json'],
       parameters: [
         {
           in: 'body',
-          name: 'Credentials',
-          description: 'User credentials',
+          name: 'Put family',
+          header: 'authorization',
+          description: 'Family update',
           required: true,
           type: 'string',
           schema: {
@@ -79,22 +81,20 @@ const familyEndpoints = {
       tags: ['families'],
       summary: 'Get info from family document',
       description: 'families router',
+      header: 'authorization',
       operationId: 'getLoggedUser',
       produces: ['application/json'],
       responses: {
-        '400': {
-          description: 'User request body format is invalid',
-        },
         '401': {
           description: 'User not authorized',
         },
-        '409': {
-          description: 'User already created family / is a part of family',
+        '404': {
+          description: 'family not found for that user',
         },
-        '201': {
-          description: 'Family was created in DB successfully',
+        '200': {
+          description: 'All info from family document',
           schema: {
-            $ref: '#/definitions/Families',
+            $ref: '#/definitions/Family',
           },
         },
       },
@@ -104,7 +104,7 @@ const familyEndpoints = {
 };
 
 const familyDefinitions = {
-  Families: {
+  Family: {
     type: 'object',
     properties: {
       balance: {
@@ -137,10 +137,10 @@ const familyDefinitions = {
 
     },
     xml: {
-      name: 'Families',
+      name: 'Family',
     },
   },
-  FamiliesRequest: {
+  FamilyRequest: {
     type: 'object',
     properties: {
       totalSalary: {
@@ -158,12 +158,9 @@ const familyDefinitions = {
       flatSquareMeters: {
         type: 'number',
       },
-      id: {
-        type: 'string',
-      },
     },
     xml: {
-      name: 'Families request',
+      name: 'Family request',
     },
   },
 };

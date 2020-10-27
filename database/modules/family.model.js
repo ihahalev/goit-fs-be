@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const familySchema = new Schema({
-  usersId: { type: Schema.Types.ObjectId, default: null, ref: 'User' },
   balance: { type: Number, default: 0, required: false },
   flatPrice: { type: Number, default: 0, required: true },
   flatSquareMeters: { type: Number, default: 0, required: true },
@@ -28,12 +27,12 @@ familySchema.method("incrementGiftsUnpacked", function () {
   return this.giftsUnpacked;
 });
 
-familySchema.pre("save", function () {
-  if (this.isNew) {
-    this.giftsForUnpacking = this.constructor.decrementGiftsForUnpacking(this.giftsForUnpacking);
+// familySchema.pre("save", function () {
+//   if (this.isNew) {
+//     this.giftsForUnpacking = this.constructor.decrementGiftsForUnpacking(this.giftsForUnpacking);
 
-    this.giftsUnpacked = this.constructor.incrementGiftsUnpacked(this.giftsUnpacked);
-  }
-});
+//     this.giftsUnpacked = this.constructor.incrementGiftsUnpacked(this.giftsUnpacked);
+//   }
+// });
 
-module.exports = mongoose.model("Familie", familySchema);
+module.exports = mongoose.model("Family", familySchema);
