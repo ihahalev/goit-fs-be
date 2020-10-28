@@ -6,9 +6,6 @@ const familyEndpoints = {
       description: 'families router',
       operationId: 'postLoggedFamily',
       produces: ['application/json'],
-      security: {
-        type: "basic",
-      },
       parameters: [
         {
           in: 'body',
