@@ -1,7 +1,8 @@
-const jwt = require("jsonwebtoken");
-const { errorHandler, ApiError } = require("../helpers");
-const config = require("../config.env");
-const UserModel = require("../database/modules/user.model");
+
+const jwt = require('jsonwebtoken');
+const { errorHandler, ApiError } = require('../helpers');
+const config = require('../config.env');
+const { userModel } = require('../database/models');
 
 module.exports = async function (req, res, next) {
   try {
@@ -15,7 +16,7 @@ module.exports = async function (req, res, next) {
       throw new ApiError(401, "User is not authorized", err);
     }
 
-    const user = await UserModel.findById(id);
+    const user = await userModel.findById(id);
 
     if (!user) {
       throw new ApiError(401, "User is not authorized");

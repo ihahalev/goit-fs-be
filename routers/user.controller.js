@@ -1,26 +1,23 @@
-// module.exports = userController;
-const Joi = require("joi");
-const bcrypt = require("bcrypt");
-const uuid = require("uuid").v4;
-const UserModel = require("../database/modules/user.model");
-const { ApiError, errorHandler, mailer } = require("../helpers");
-const userModel = require("../database/modules/user.model");
+const Joi = require('joi');
+const uuid = require('uuid').v4;
+const { userModel } = require('../database/models');
+const { ApiError, errorHandler, mailer } = require('../helpers');
+const responseNormalizer = require('../normalizers/response-normalizer');
 
-// const authRouter = Router();
-class userController {
+class UserController {
   constructor() {}
   async userRegister(req, res) {
     try {
       const { name, email, password } = req.body;
 
-      const user = await UserModel.findOne({ email });
+      const user = await userModel.findOne({ email });
 
-      if (user) throw new ApiError(409, "User with such email already exist");
+      if (user) throw new ApiError(409, 'User with such email already exist');
 
-      const passwordHash = await UserModel.hashPassword(password);
+      const passwordHash = await userModel.hashPassword(password);
       const verificationToken = uuid();
 
-      const { _id } = await UserModel.create({
+      const { _id } = await userModel.create({
         name,
         email,
         passwordHash,
@@ -29,7 +26,7 @@ class userController {
 
       await mailer.sendVerificationMail(email, verificationToken);
 
-      res.status(201).send({ id: _id, name, email });
+      responseNormalizer(201, res, { id: _id, name, email });
     } catch (err) {
       errorHandler(req, res, err);
     }
@@ -41,16 +38,16 @@ class userController {
     try {
       const { email, password } = req.body;
 
-      const foundUser = await UserModel.findOne({ email });
+      const foundUser = await userModel.findOne({ email });
 
       if (!foundUser) {
-        throw new ApiError(401, "Email or password is wrong");
+        throw new ApiError(401, 'Email or password is wrong');
       }
       if (foundUser.verificationToken) {
-        throw new ApiError(412, "Email not verified");
+        throw new ApiError(412, 'Email not verified');
       }
       const isValid = await foundUser.isPasswordValid(password);
-      if (!isValid) throw new ApiError(401, "Email or password is wrong");
+      if (!isValid) throw new ApiError(401, 'Email or password is wrong');
 
       const token = await foundUser.generateAndSaveToken();
 
@@ -67,15 +64,15 @@ class userController {
     try {
       const { verificationToken } = req.params;
 
-      const foundUser = await UserModel.findOne({ verificationToken });
+      const foundUser = await userModel.findOne({ verificationToken });
 
-      if (!foundUser) throw new ApiError(404, "User is not found");
+      if (!foundUser) throw new ApiError(404, 'User is not found');
 
       foundUser.verificationToken = null;
 
       await foundUser.save();
 
-      res.status(200).send("User is successfully verified");
+      responseNormalizer(200, res, 'User is successfully verified');
     } catch (err) {
       errorHandler(req, res, err);
     }
@@ -92,7 +89,7 @@ class userController {
       }).validate(req.body);
 
       if (validationError) {
-        throw new ApiError(400, "Bad request", validationError);
+        throw new ApiError(400, 'Bad request', validationError);
       }
 
       next();
@@ -108,7 +105,7 @@ class userController {
       const { activeToken, user } = req;
 
       user.tokens = user.tokens.filter(
-        (tokenRecord) => tokenRecord.token !== activeToken
+        (tokenRecord) => tokenRecord.token !== activeToken,
       );
 
       await user.save();
@@ -123,17 +120,6 @@ class userController {
 
   async userCurrent(req, res) {
     try {
-      //       User stories:
-      // - Should throw 401 if user not authorized
-      // - Should return 200 and info about logged user
-
-      // Response body
-      // {
-      // id - string,
-      // username: string,
-      // email - string,
-      // familyId - string,
-      // }
       const { _id, name, email, familyId } = req.user;
 
       res.status(200).send({ _id, name, email, familyId });
@@ -143,4 +129,4 @@ class userController {
   }
 }
 
-module.exports = new userController();
+module.exports = new UserController();
