@@ -1,8 +1,10 @@
 const Joi = require('joi');
 const uuid = require('uuid').v4;
 const { userModel } = require('../database/models');
+// const { db } = require('../database/models/user.model');
 const { ApiError, errorHandler, mailer } = require('../helpers');
 const responseNormalizer = require('../normalizers/response-normalizer');
+const config = require('../config.env');
 
 class UserController {
   constructor() {}
@@ -52,7 +54,11 @@ class UserController {
       const token = await foundUser.generateAndSaveToken();
 
       const { _id, name, familyId } = foundUser;
-      res.send({ user: { id: _id, username: name, email, familyId }, token });
+
+      responseNormalizer(201, res, {
+        user: { id: _id, username: name, email, familyId },
+        token,
+      });
     } catch (err) {
       errorHandler(req, res, err);
     }
@@ -100,17 +106,12 @@ class UserController {
 
   //========================================
 
-  async userLogout(req, res) {
+  async logout(req, res) {
     try {
       const { activeToken, user } = req;
 
-      user.tokens = user.tokens.filter(
-        (tokenRecord) => tokenRecord.token !== activeToken,
-      );
-
-      await user.save();
-
-      res.status(204).send();
+      user.update(user.id, { $pull: { tokens: { activeToken } } });
+      responseNormalizer(204, res, {});
     } catch (err) {
       errorHandler(req, res, err);
     }
@@ -122,7 +123,7 @@ class UserController {
     try {
       const { _id, name, email, familyId } = req.user;
 
-      res.status(200).send({ _id, name, email, familyId });
+      responseNormalizer(200, res, { _id, name, email, familyId });
     } catch (err) {
       errorHandler(req, res, err);
     }
