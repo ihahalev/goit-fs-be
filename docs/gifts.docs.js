@@ -8,16 +8,14 @@ const giftsEndpoints = {
       produces: ['application/json'],
       parameters: [
         {
-          in: 'Authorization header',
-          name: '',
-          description: 'gifts',
+          in: 'header',
+          name: 'authorization',
+          description: 'authorization',
           required: true,
           type: 'string',
-          schema: {
-            $ref: '#/definitions/Gifts',
-          },
         },
       ],
+
       responses: {
         '401': {
           description: 'user not authorized',
@@ -28,6 +26,13 @@ const giftsEndpoints = {
         '200': {
           description: 'decrement giftsForUnpacking & increment giftsUnpacked values',
         },
+      },
+      security: {
+        api_key: {
+          type: 'apiKey',
+          name: 'Authorization',
+          in: 'header'
+        }
       },
     },
   },

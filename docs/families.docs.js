@@ -4,21 +4,32 @@ const familyEndpoints = {
       tags: ['families'],
       summary: 'Created object families in response',
       description: 'families router',
-      operationId: 'postLoggedUser',
+      operationId: 'postLoggedFamily',
       produces: ['application/json'],
       parameters: [
         {
           in: 'body',
           name: 'families',
-          header: 'authorization',
           description: 'Created object families. Token required',
           required: true,
           type: 'string',
           schema: {
-            $ref: '#/definitions/FamiliesRequest',
+            $ref: '#/definitions/FamilyRequest',
           },
+          in: 'header',
+          name: 'Authorization',
+          description: 'Authorization',
+          required: true,
+          type: 'string',
         },
       ],
+      security: {
+        token: {
+          type: 'apiKey',
+          name: 'api_key',
+          in: 'header'
+        }
+      },
       responses: {
         '400': {
           description: 'Request body format is invalid',
@@ -32,16 +43,24 @@ const familyEndpoints = {
         '200': {
           description: 'Family was created in DB successfully',
           schema: {
-            $ref: '#/definitions/Families',
+            $ref: '#/definitions/Family',
           },
         },
       },
+      // security: {
+      //   api_key: {
+      //     type: 'apiKey',
+      //     name: 'api_key',
+      //     in: 'header'
+      //   }
+      // }
     },
+
     put: {
       tags: ['families'],
       summary: 'Update info from family document with authorization header',
       description: '',
-      operationId: 'putLoggedUser',
+      operationId: 'putLoggedFamily',
       produces: ['application/json'],
       parameters: [
         {
@@ -52,7 +71,7 @@ const familyEndpoints = {
           required: true,
           type: 'string',
           schema: {
-            $ref: '#/definitions/Families',
+            $ref: '#/definitions/Family',
           },
         },
       ],
@@ -69,9 +88,16 @@ const familyEndpoints = {
         '200': {
           description: 'Family was created in DB successfully',
           schema: {
-            $ref: '#/definitions/Families',
+            $ref: '#/definitions/Family',
           },
         },
+      },
+      security: {
+        api_key: {
+          type: 'apiKey',
+          name: 'Authorization',
+          in: 'header'
+        }
       },
     },
   },
@@ -81,9 +107,17 @@ const familyEndpoints = {
       tags: ['families'],
       summary: 'Get info from family document',
       description: 'families router',
-      header: 'authorization',
-      operationId: 'getLoggedUser',
+      operationId: 'getLoggedFamily',
       produces: ['application/json'],
+      parameters: [
+        {
+          in: 'authorization',
+          name: 'Bearer Token',
+          description: 'Bearer Token',
+          required: true,
+          type: 'string',
+        },
+      ],
       responses: {
         '401': {
           description: 'User not authorized',
@@ -98,9 +132,16 @@ const familyEndpoints = {
           },
         },
       },
+
+      security: {
+        api_key: {
+          type: 'apiKey',
+          name: 'Authorization',
+          in: 'header'
+        }
+      },
     },
   },
-
 };
 
 const familyDefinitions = {
@@ -131,9 +172,6 @@ const familyDefinitions = {
       incomePercentageToSavings: {
         type: 'number',
       },
-      id: {
-        type: 'string',
-      }
 
     },
     xml: {
@@ -163,6 +201,7 @@ const familyDefinitions = {
       name: 'Family request',
     },
   },
+
 };
 
 module.exports.familyEndpoints = familyEndpoints;

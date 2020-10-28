@@ -1,12 +1,11 @@
 const Joi = require('Joi');
 const { familyModel } = require('../database/models');
 const { ApiError, errorHandler, getLogger } = require('../helpers');
-const responseNormalizer = require('../normalizers/response-normalizer');
 
 const logger = getLogger('gifts');
 
 class giftsController {
-  constructor() {}
+  constructor() { }
 
   get unpackGift() {
     return this._unpackGift.bind(this);
@@ -25,17 +24,21 @@ class giftsController {
       const familyUpdate = await familyModel.findByIdAndUpdate(
         familyId,
         {
-          giftsForUnpacking: family.decrementGiftsForUnpacking(),
-          giftsUnpacked: family.incrementGiftsUnpacked(),
+          giftsForUnpacking: family.incrementGiftsUnpacked(),
+          giftsUnpacked: family.decrementGiftsForUnpacking(),
         },
         { new: true },
       );
 
       const { giftsForUnpacking } = familyUpdate;
 
-      return responseNormalizer(200, res, {
-        giftsForUnpacking,
+      return res.status(200).send({
+        gifts: {
+          giftsUnpacked,
+          giftsForUnpacking,
+        }
       });
+
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);

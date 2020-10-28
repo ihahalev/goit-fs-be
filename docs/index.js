@@ -6,6 +6,7 @@ const { giftsDefinitions, giftsEndpoints } = require('./gifts.docs');
 // module.exports = test;
 
 module.exports = {
+  // openapi: '3.0.2',
   swagger: '2.0',
   info: {
     description: '',
@@ -19,11 +20,24 @@ module.exports = {
   basePath: '/api',
   tags: [
     {
-      name: 'example',
-      description: 'example router',
+      name: 'families',
+      description: 'families router',
+    },
+    {
+      name: 'gifts',
+      description: 'gifts router',
     },
   ],
   schemes: swagger.schemes,
+  securityDefinitions: {
+    petstore_auth: {
+      type: 'oauth2',
+      authorizationUrl: 'http://petstore.swagger.io/oauth/dialog',
+      flow: 'implicit',
+      scopes: [{}]
+    },
+    api_key: { type: 'apiKey', name: 'api_key', in: 'header' }
+  },
   paths: {
     ...familyEndpoints,
     ...giftsEndpoints,

@@ -1,7 +1,6 @@
 const Joi = require('Joi');
 const { familyModel } = require('../database/models');
 const { ApiError, errorHandler, getLogger } = require('../helpers');
-const responseNormalizer = require('../normalizers/response-normalizer');
 
 const logger = getLogger('FamiliesController');
 
@@ -34,7 +33,31 @@ class FamilyController {
       req.user.familyId = createdFamily._id;
       req.user.save();
 
-      return responseNormalizer(201, res, createdFamily);
+      const { balance,
+        flatPrice,
+        flatSquareMeters,
+        totalSalary,
+        passiveIncome,
+        incomePercentageToSavings,
+        giftsUnpacked,
+        giftsForUnpacking,
+      } = createdFamily;
+
+      return res.status(201).send({
+        info: {
+          balance,
+          flatPrice,
+          flatSquareMeters,
+          totalSalary,
+          passiveIncome,
+          incomePercentageToSavings,
+        },
+        gifts: {
+          giftsUnpacked,
+          giftsForUnpacking,
+        }
+      });
+
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
@@ -47,7 +70,31 @@ class FamilyController {
 
       const currentFamily = await familyModel.findById(familyId);
 
-      return responseNormalizer(200, res, currentFamily);
+      const { balance,
+        flatPrice,
+        flatSquareMeters,
+        totalSalary,
+        passiveIncome,
+        incomePercentageToSavings,
+        giftsUnpacked,
+        giftsForUnpacking,
+      } = currentFamily;
+
+      return res.status(200).send({
+        info: {
+          balance,
+          flatPrice,
+          flatSquareMeters,
+          totalSalary,
+          passiveIncome,
+          incomePercentageToSavings,
+        },
+        gifts: {
+          giftsUnpacked,
+          giftsForUnpacking,
+        }
+      });
+
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
@@ -64,7 +111,7 @@ class FamilyController {
         { new: true },
       );
 
-      return responseNormalizer(200, res, familyToUpdate);
+      return res.status(200).send(familyToUpdate);
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
