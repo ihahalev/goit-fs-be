@@ -6,15 +6,18 @@ const familyEndpoints = {
       description: 'families router',
       operationId: 'postLoggedFamily',
       produces: ['application/json'],
+      security: {
+        type: "basic",
+      },
       parameters: [
         {
           in: 'body',
           name: 'families',
-          description: 'Created object families. Token required',
+          description: 'Created object family',
           required: true,
           type: 'string',
           schema: {
-            $ref: '#/definitions/FamilyRequest',
+            $ref: '#/definitions/FamilyCreatedRequest',
           },
         },
         {
@@ -25,13 +28,6 @@ const familyEndpoints = {
           type: 'string',
         }
       ],
-      security: {
-        token: {
-          type: 'apiKey',
-          name: 'api_key',
-          in: 'header'
-        }
-      },
       responses: {
         '400': {
           description: 'Request body format is invalid',
@@ -53,8 +49,8 @@ const familyEndpoints = {
 
     put: {
       tags: ['families'],
-      summary: 'Update info from family document with authorization header',
-      description: '',
+      summary: 'Update info from family document',
+      description: 'Update family',
       operationId: 'putLoggedFamily',
       produces: ['application/json'],
       parameters: [
@@ -65,7 +61,7 @@ const familyEndpoints = {
           required: true,
           type: 'string',
           schema: {
-            $ref: '#/definitions/FamilyRequest',
+            $ref: '#/definitions/FamilyUpdateRequest',
           },
         },
         {
@@ -89,16 +85,12 @@ const familyEndpoints = {
         '200': {
           description: 'Family was created in DB successfully',
           schema: {
-            $ref: '#/definitions/FamilyRequest',
+            $ref: '#/definitions/Family',
           },
         },
       },
       security: {
-        api_key: {
-          type: 'apiKey',
-          name: 'Authorization',
-          in: 'header'
-        }
+        type: "basic"
       },
     },
   },
@@ -110,6 +102,9 @@ const familyEndpoints = {
       description: 'families router',
       operationId: 'getLoggedFamily',
       produces: ['application/json'],
+      security: {
+        type: 'basic',
+      },
       parameters: [
         {
           in: 'header',
@@ -133,14 +128,6 @@ const familyEndpoints = {
           },
         },
       },
-
-      security: {
-        api_key: {
-          type: 'apiKey',
-          name: 'Authorization',
-          in: 'header'
-        }
-      },
     },
   },
 };
@@ -149,19 +136,50 @@ const familyDefinitions = {
   Family: {
     type: 'object',
     properties: {
+      info: {
+        type: 'object',
+        properties: {
+          balance: {
+            type: 'number',
+          },
+          flatPrice: {
+            type: 'number',
+          },
+          flatSquareMeters: {
+            type: 'number',
+          },
+          totalSalary: {
+            type: 'number',
+          },
+          passiveIncome: {
+            type: 'number',
+          },
+          incomePercentageToSavings: {
+            type: 'number',
+          },
+        }
+      },
+      gifts: {
+        type: 'object',
+        properties: {
+          giftsUnpacked: {
+            type: 'number',
+          },
+          giftsForUnpacking: {
+            type: 'number',
+          },
+        }
+      },
+    },
+    xml: {
+      name: 'Family',
+    },
+  },
+
+  FamilyCreatedRequest: {
+    type: 'object',
+    properties: {
       balance: {
-        type: 'number',
-      },
-      flatPrice: {
-        type: 'number',
-      },
-      flatSquareMeters: {
-        type: 'number',
-      },
-      giftsUnpacked: {
-        type: 'number',
-      },
-      giftsForUnpacking: {
         type: 'number',
       },
       totalSalary: {
@@ -173,13 +191,18 @@ const familyDefinitions = {
       incomePercentageToSavings: {
         type: 'number',
       },
-
+      flatPrice: {
+        type: 'number',
+      },
+      flatSquareMeters: {
+        type: 'number',
+      },
     },
     xml: {
-      name: 'Family',
+      name: 'FamilyRequest',
     },
   },
-  FamilyRequest: {
+  FamilyUpdateRequest: {
     type: 'object',
     properties: {
       totalSalary: {
@@ -199,7 +222,7 @@ const familyDefinitions = {
       },
     },
     xml: {
-      name: 'Family request',
+      name: 'FamilyUpdateRequest',
     },
   },
 

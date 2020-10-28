@@ -6,6 +6,13 @@ const giftsEndpoints = {
       description: 'gifts router',
       operationId: 'giftsLoggedUser',
       produces: ['application/json'],
+      security: {
+        api_key: {
+          type: 'apiKey',
+          name: 'Authorization',
+          in: 'header'
+        }
+      },
       parameters: [
         {
           in: 'header',
@@ -15,7 +22,6 @@ const giftsEndpoints = {
           type: 'string',
         },
       ],
-
       responses: {
         '401': {
           description: 'user not authorized',
@@ -27,13 +33,6 @@ const giftsEndpoints = {
           description: 'decrement giftsForUnpacking & increment giftsUnpacked values',
         },
       },
-      security: {
-        api_key: {
-          type: 'apiKey',
-          name: 'Authorization',
-          in: 'header'
-        }
-      },
     },
   },
 };
@@ -42,9 +41,17 @@ const giftsDefinitions = {
   Gifts: {
     type: 'object',
     properties: {
-      giftsForUnpacking: {
-        type: 'number',
-      },
+      gifts: {
+        type: "object",
+        properties: {
+          giftsForUnpacking: {
+            type: 'number',
+          },
+          giftsUnpacked: {
+            type: 'number',
+          },
+        }
+      }
     },
     xml: {
       name: 'Gifts',

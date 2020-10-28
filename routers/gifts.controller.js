@@ -23,8 +23,8 @@ class giftsController {
       const familyUpdate = await familyModel.findByIdAndUpdate(
         familyId,
         {
-          giftsForUnpacking: family.incrementGiftsUnpacked(),
-          giftsUnpacked: family.decrementGiftsForUnpacking(),
+          giftsForUnpacking: family.decrementGiftsForUnpacking(),
+          giftsUnpacked: family.incrementGiftsUnpacked(),
         },
         { new: true },
       );

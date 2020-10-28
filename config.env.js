@@ -32,11 +32,6 @@ module.exports = {
 
   swagger: {
     host: `${process.env.SRV_URL}`,
-    schemes: ['https', 'http'],
+    schemes: ['http'],
   },
-
-  // swagger: {
-  //   host: `${process.env.SRV_URL}:${process.env.PORT}`,
-  //   schemes: ['https'],
-  // },
 };

@@ -34,7 +34,8 @@ class FamilyController {
       req.user.familyId = createdFamily._id;
       req.user.save();
 
-      const { balance,
+      const {
+        balance,
         flatPrice,
         flatSquareMeters,
         totalSalary,
