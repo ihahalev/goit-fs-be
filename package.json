@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ihahalev/goit-fs-be.git"
+    "url": "git+https://github.com/ihahalev/goit-nodejs.git"
   },
   "author": "Ivan Hahalev",
   "license": "ISC",
