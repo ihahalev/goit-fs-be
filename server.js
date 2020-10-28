@@ -4,17 +4,19 @@ const cors = require('cors');
 const path = require('path');
 
 const configEnv = require('./config.env');
-const { usersRouter, transactionsRouter } = require('./routers');
+const { usersRouter, familiesRouter, giftsRouter, transactionsRouter } = require('./routers');
 
-const { mailer, ApiError } = require('./helpers');
+const { mailer, getLogger } = require('./helpers');
 const connection = require('./database/Connection');
 
+const logger = getLogger('Server');
 module.exports = class Server {
   constructor() {
     this.server = null;
   }
 
   async start() {
+
     await mailer.init();
     await connection.connect();
     this.initServer();
@@ -45,20 +47,17 @@ module.exports = class Server {
     this.server.use('/', express.static(path.join(__dirname, 'public')));
     this.server.use('/api/users', usersRouter);
     this.server.use('/api/transactions', transactionsRouter);
-    // this.server.use('/', () => {
-    //   throw new ApiError(404, 'Not found', {
-    //     message: 'Not authorized',
-    //   });
-    // });
+    this.server.use('/api/families', familiesRouter);
+    this.server.use('/api/gifts', giftsRouter);
   }
 
   startListening() {
     return this.server.listen(configEnv.port, (err) => {
       if (err) {
-        return console.error(err);
+        return logger.error(err);
       }
 
-      console.info('server started at port', configEnv.port);
+      logger.info('server started at port', configEnv.port);
     });
   }
 };
