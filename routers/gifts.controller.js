@@ -1,5 +1,6 @@
 const { familyModel } = require('../database/models');
 const { ApiError, errorHandler, getLogger } = require('../helpers');
+const responseNormalizer = require('../normalizers/response-normalizer');
 
 const logger = getLogger('gifts');
 
@@ -31,7 +32,7 @@ class giftsController {
 
       const { giftsForUnpacking, giftsUnpacked } = familyUpdate;
 
-      return res.status(200).send({
+      return responseNormalizer(200, res, {
         gifts: {
           giftsUnpacked,
           giftsForUnpacking,
