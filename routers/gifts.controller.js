@@ -1,4 +1,3 @@
-const Joi = require('Joi');
 const { familyModel } = require('../database/models');
 const { ApiError, errorHandler, getLogger } = require('../helpers');
 
