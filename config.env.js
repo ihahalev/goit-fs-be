@@ -8,7 +8,7 @@ module.exports = {
   dbName: process.env.DB_NAME,
   dbCollection: process.env.DB_COLLECTION,
   jwtPrivateKey: process.env.TOKEN_PRIVATE_KEY,
-  srvUrl: `${process.env.SRV_URL}:${process.env.PORT}`,
+  srvUrl: `${process.env.SRV_URL}`,
   imgUrl: `${process.env.SRV_URL}:${process.env.PORT}/images/`,
   allowedOrigin: `${process.env.HOST_URL}`,
 

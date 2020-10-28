@@ -5,11 +5,7 @@ const responseNormalizer = (status, res, object) => {
   if (object instanceof ApiError) {
     isError = true;
   }
-  return res.status(status).send({
-    status,
-    data: isError ? object.data : object,
-    message: isError ? object.message : undefined,
-  });
+  return res.status(status).send(object);
 };
 
 module.exports = responseNormalizer;

@@ -6,4 +6,4 @@ exports.transactionCategories = [
   'Транспорт',
   'ЖКХ',
 ];
-exports.transactionTypes = ['EXPENSE', 'INCOME'];
+exports.transactionTypes = ['EXPENSE', 'INCOME', 'PERCENT'];
