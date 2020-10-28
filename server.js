@@ -4,7 +4,12 @@ const cors = require('cors');
 const path = require('path');
 
 const configEnv = require('./config.env');
-const { usersRouter, familiesRouter, giftsRouter } = require('./routers');
+const {
+  usersRouter,
+  familiesRouter,
+  giftsRouter,
+  transactionsRouter,
+} = require('./routers');
 
 const { mailer, getLogger } = require('./helpers');
 const connection = require('./database/Connection');
@@ -15,8 +20,15 @@ module.exports = class Server {
     this.server = null;
   }
 
-  async start() {
+  async startTest() {
+    await mailer.init();
+    await connection.connect();
+    this.initServer();
+    this.initMiddlewares();
+    this.initRoutes();
+  }
 
+  async start() {
     await mailer.init();
     await connection.connect();
     this.initServer();
@@ -27,6 +39,10 @@ module.exports = class Server {
       connection.close();
     });
     return retListen;
+  }
+
+  async close() {
+    return connection.close;
   }
 
   initServer() {
@@ -42,6 +58,7 @@ module.exports = class Server {
   initRoutes() {
     this.server.use('/', express.static(path.join(__dirname, 'public')));
     this.server.use('/api/users', usersRouter);
+    this.server.use('/api/transactions', transactionsRouter);
     this.server.use('/api/families', familiesRouter);
     this.server.use('/api/gifts', giftsRouter);
   }

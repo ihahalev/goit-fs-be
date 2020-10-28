@@ -28,8 +28,6 @@ module.exports = {
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASS,
     },
-    SGKey: process.env.SENDGRID_API_KEY,
-    SGUser: process.env.MAIL_SGUSER,
   },
 
   swagger: {
