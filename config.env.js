@@ -37,4 +37,9 @@ module.exports = {
       pass: process.env.SMTP_PASS,
     },
   },
+
+  swagger: {
+    host: `${process.env.SRV_URL}:${process.env.PORT}`,
+    schemes: ['https'],
+  },
 };
