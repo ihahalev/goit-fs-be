@@ -1,3 +1,4 @@
+const responseNormalizer = require('../normalizers/response-normalizer');
 const ApiError = require('./ApiError');
 const getLogger = require('./get-logger');
 
@@ -11,11 +12,11 @@ module.exports = (req, res, error) => {
   // logger.error('=========================');
 
   if (error instanceof ApiError) {
-    return res.status(error.status).send({
+    return responseNormalizer(error.status, res, {
       message: error.message,
       data: error.data,
     });
   }
 
-  res.status(500).send({ message: 'Internal server error' });
+  responseNormalizer(500, res, { message: 'Internal server error' });
 };

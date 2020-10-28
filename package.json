@@ -2,12 +2,10 @@
   "name": "goit-nodejs",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "nodemonConfig": {
-    "ignore": [
-      "db/*"
-    ]
+  "engines": {
+    "node": "12.x"
   },
+  "main": "index.js",
   "scripts": {
     "test": "mocha tests/**/*.test.js --exit --timeout 5000",
     "start": "node index.js",
@@ -31,6 +29,7 @@
   },
   "dependencies": {
     "@sendgrid/mail": "^7.2.6",
+    "bcrypt": "^5.0.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
@@ -45,7 +44,6 @@
     "js-image-generator": "^1.0.3",
     "jsonwebtoken": "^8.5.1",
     "log4js": "^6.3.0",
-    "mogoose": "0.0.1-security",
     "mongodb": "^3.6.2",
     "mongoose": "^5.10.5",
     "morgan": "^1.10.0",
@@ -54,6 +52,8 @@
     "password-hash": "^1.2.2",
     "should": "^13.2.3",
     "uuid": "^8.3.0",
-    "yargs": "^15.4.1"
+    "yargs": "^15.4.1",
+    "got": "^11.3.0",
+    "tape": "^4.7.0"
   }
 }

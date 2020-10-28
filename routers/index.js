@@ -1,2 +1,2 @@
-exports.usersRouter = require('./usersRouter');
-exports.transactionsRouter = require('./transactionsRouter');
+exports.usersRouter = require('./users.router');
+exports.transactionsRouter = require('./transactions.router');

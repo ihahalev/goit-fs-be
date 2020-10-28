@@ -6,8 +6,8 @@ const faker = require('faker');
 const mongoose = require('mongoose');
 
 const Server = require('../../server');
-const TransactionModel = require('../../database/models/TransactionModel');
-const UserModel = require('../../database/models/UserModel');
+const TransactionModel = require('../../database/models/transaction.model');
+const UserModel = require('../../database/models/user.model');
 const configEnv = require('../../config.env');
 const userModel = require('../types/userModel');
 
