@@ -89,9 +89,6 @@ const familyEndpoints = {
           },
         },
       },
-      security: {
-        type: "basic"
-      },
     },
   },
 
@@ -102,9 +99,6 @@ const familyEndpoints = {
       description: 'families router',
       operationId: 'getLoggedFamily',
       produces: ['application/json'],
-      security: {
-        type: 'basic',
-      },
       parameters: [
         {
           in: 'header',

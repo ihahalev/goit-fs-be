@@ -6,13 +6,6 @@ const giftsEndpoints = {
       description: 'gifts router',
       operationId: 'giftsLoggedUser',
       produces: ['application/json'],
-      security: {
-        api_key: {
-          type: 'apiKey',
-          name: 'Authorization',
-          in: 'header'
-        }
-      },
       parameters: [
         {
           in: 'header',
