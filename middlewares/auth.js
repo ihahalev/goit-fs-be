@@ -18,7 +18,7 @@ module.exports = async function (req, res, next) {
     const user = await UserModel.findById(id);
 
     if (!user) {
-      throw new ApiError(402, "User is not authorized");
+      throw new ApiError(401, "User is not authorized");
     }
 
     const usedToken = user.tokens.find(
@@ -26,7 +26,7 @@ module.exports = async function (req, res, next) {
     );
 
     if (!usedToken) {
-      throw new ApiError(403, "User is not authorized");
+      throw new ApiError(401, "User is not authorized");
     }
 
     function checkTokenExpires() {

@@ -61,6 +61,8 @@ class userController {
     }
   }
 
+  //=============================================
+
   async verifyEmail(req, res, next) {
     try {
       const { verificationToken } = req.params;
@@ -78,6 +80,8 @@ class userController {
       errorHandler(req, res, err);
     }
   }
+
+  //==================================================
 
   validateUserObject(req, res, next) {
     try {
@@ -97,17 +101,42 @@ class userController {
     }
   }
 
+  //========================================
+
   async userLogout(req, res) {
     try {
       const { activeToken, user } = req;
-  
+
       user.tokens = user.tokens.filter(
         (tokenRecord) => tokenRecord.token !== activeToken
       );
-  
+
       await user.save();
-  
+
       res.status(204).send();
+    } catch (err) {
+      errorHandler(req, res, err);
+    }
+  }
+
+  //==========================
+
+  async userCurrent(req, res) {
+    try {
+      //       User stories:
+      // - Should throw 401 if user not authorized
+      // - Should return 200 and info about logged user
+
+      // Response body
+      // {
+      // id - string,
+      // username: string,
+      // email - string,
+      // familyId - string,
+      // }
+      const { _id, name, email, familyId } = req.user;
+
+      res.status(200).send({ _id, name, email, familyId });
     } catch (err) {
       errorHandler(req, res, err);
     }
