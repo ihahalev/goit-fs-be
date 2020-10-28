@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const { familyModel } = require('../database/models');
 const { ApiError, errorHandler, getLogger } = require('../helpers');
+const responseNormalizer = require('../normalizers/response-normalizer');
 
 const logger = getLogger('FamiliesController');
 
@@ -43,7 +44,7 @@ class FamilyController {
         giftsForUnpacking,
       } = createdFamily;
 
-      return res.status(201).send({
+      return responseNormalizer(201, res, {
         info: {
           balance,
           flatPrice,
@@ -80,7 +81,7 @@ class FamilyController {
         giftsForUnpacking,
       } = currentFamily;
 
-      return res.status(200).send({
+      return responseNormalizer(200, res, {
         info: {
           balance,
           flatPrice,
@@ -94,6 +95,7 @@ class FamilyController {
           giftsForUnpacking,
         }
       });
+
 
     } catch (err) {
       logger.error(err);
@@ -111,7 +113,31 @@ class FamilyController {
         { new: true },
       );
 
-      return res.status(200).send(familyToUpdate);
+      const { balance,
+        flatPrice,
+        flatSquareMeters,
+        totalSalary,
+        passiveIncome,
+        incomePercentageToSavings,
+        giftsUnpacked,
+        giftsForUnpacking,
+      } = familyToUpdate;
+
+      return responseNormalizer(200, res, {
+        info: {
+          balance,
+          flatPrice,
+          flatSquareMeters,
+          totalSalary,
+          passiveIncome,
+          incomePercentageToSavings,
+        },
+        gifts: {
+          giftsUnpacked,
+          giftsForUnpacking,
+        }
+      });
+
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);

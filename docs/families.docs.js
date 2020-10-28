@@ -16,12 +16,14 @@ const familyEndpoints = {
           schema: {
             $ref: '#/definitions/FamilyRequest',
           },
+        },
+        {
           in: 'header',
           name: 'Authorization',
           description: 'Authorization',
           required: true,
           type: 'string',
-        },
+        }
       ],
       security: {
         token: {
@@ -47,13 +49,6 @@ const familyEndpoints = {
           },
         },
       },
-      // security: {
-      //   api_key: {
-      //     type: 'apiKey',
-      //     name: 'api_key',
-      //     in: 'header'
-      //   }
-      // }
     },
 
     put: {
@@ -65,15 +60,21 @@ const familyEndpoints = {
       parameters: [
         {
           in: 'body',
-          name: 'Put family',
-          header: 'authorization',
+          name: 'Update object family',
           description: 'Family update',
           required: true,
           type: 'string',
           schema: {
-            $ref: '#/definitions/Family',
+            $ref: '#/definitions/FamilyRequest',
           },
         },
+        {
+          in: 'header',
+          name: 'Authorization',
+          description: 'Authorization',
+          required: true,
+          type: 'string',
+        }
       ],
       responses: {
         '400': {
@@ -88,7 +89,7 @@ const familyEndpoints = {
         '200': {
           description: 'Family was created in DB successfully',
           schema: {
-            $ref: '#/definitions/Family',
+            $ref: '#/definitions/FamilyRequest',
           },
         },
       },
@@ -111,12 +112,12 @@ const familyEndpoints = {
       produces: ['application/json'],
       parameters: [
         {
-          in: 'authorization',
-          name: 'Bearer Token',
-          description: 'Bearer Token',
+          in: 'header',
+          name: 'Authorization',
+          description: 'Authorization',
           required: true,
           type: 'string',
-        },
+        }
       ],
       responses: {
         '401': {
