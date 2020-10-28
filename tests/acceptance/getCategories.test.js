@@ -6,10 +6,9 @@ const faker = require('faker');
 const mongoose = require('mongoose');
 
 const Server = require('../../server');
-const TransactionModel = require('../../database/models/transaction.model');
-const UserModel = require('../../database/models/user.model');
+const { userModel } = require('../../database/models');
 const configEnv = require('../../config.env');
-const userModel = require('../types/userModel');
+const userTestModel = require('../types/userModel');
 
 describe('GET /api/transactions/categories', () => {
   let server;
@@ -17,13 +16,12 @@ describe('GET /api/transactions/categories', () => {
   const financeServer = new Server();
 
   before(async () => {
-    server = await financeServer.start();
+    server = await financeServer.startTest();
   });
 
   after(async () => {
     sinon.restore();
     await mongoose.connection.close();
-    // process.exit(0);
   });
 
   it('Should throw 401 Unauthorized', async () => {
@@ -34,12 +32,12 @@ describe('GET /api/transactions/categories', () => {
   });
 
   context('when authorized', () => {
-    const user = new userModel();
+    const user = new userTestModel();
     token = jwt.sign(faker.random.word(), configEnv.jwtPrivateKey);
     user.set(token);
 
     before(() => {
-      sinon.replace(UserModel, 'findById', sinon.fake.returns(user));
+      sinon.replace(userModel, 'findById', sinon.fake.returns(user));
     });
 
     afterEach(() => {
@@ -52,7 +50,7 @@ describe('GET /api/transactions/categories', () => {
 
     it('Should respond with 200 and categories array', async () => {
       sinon.replace(
-        UserModel,
+        userModel,
         'findOne',
         sinon.fake.returns({ _id: 1, token, familyId: 1 }),
       );

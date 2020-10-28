@@ -1,26 +1,31 @@
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 
-const TransactionModel = require('../database/models/transaction.model');
-const UserModel = require('../database/models/user.model');
-// const FamilyModel = require('../database/models/FamilyModel');
+const {
+  transactionModel,
+  userModel,
+  familyModel,
+} = require('../database/models');
 const { errorHandler, ApiError } = require('../helpers');
 const responseNormalizer = require('../normalizers/response-normalizer');
 
-const { transactionCategories, transactionTypes } = require('../database/staticData');
+const {
+  transactionCategories,
+  transactionTypes,
+} = require('../database/staticData');
 
 class TransactionController {
   constructor() {}
 
   async createTransaction(req, res) {
     try {
-      const user = await UserModel.findById(req.user);
+      const user = await userModel.findById(req.user);
       if (!user.familyId) {
         throw new ApiError(403, 'Forbidden', {
           message: 'Not part of a Family',
         });
       }
-      const family = FamilyModel.findById(user.familyId);
+      const family = familyModel.findById(user.familyId);
       if (!family) {
         throw new ApiError(403, 'Forbidden', {
           message: 'Not part of a Family',
@@ -28,7 +33,12 @@ class TransactionController {
       }
 
       const { amount, type, category, comment } = req.body;
-      const { _id, type: dbType, category: dbCategory, transactionDate } = await TransactionModel.create({
+      const {
+        _id,
+        type: dbType,
+        category: dbCategory,
+        transactionDate,
+      } = await transactionModel.create({
         amount,
         type,
         category,

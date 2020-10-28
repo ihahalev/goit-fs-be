@@ -1,5 +1,5 @@
 {
-  "name": "goit-nodejs",
+  "name": "goit-backend",
   "version": "1.0.0",
   "description": "",
   "engines": {
@@ -16,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ihahalev/goit-nodejs.git"
+    "url": "git+https://github.com/ihahalev/goit-fs-be.git"
   },
   "author": "Ivan Hahalev",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ihahalev/goit-nodejs/issues"
+    "url": "https://github.com/ihahalev/goit-fs-be/issues"
   },
-  "homepage": "https://github.com/ihahalev/goit-nodejs#readme",
+  "homepage": "https://github.com/ihahalev/goit-fs-be#readme",
   "devDependencies": {
     "bcrypt": "^5.0.0",
     "faker": "^5.1.0",

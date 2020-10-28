@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { errorHandler, ApiError } = require('../helpers');
 const config = require('../config.env');
-const userModel = require('../database/modules/user.model');
+const { userModel } = require('../database/models');
 
 module.exports = async function (req, res, next) {
   try {

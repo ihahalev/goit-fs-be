@@ -1,25 +1,23 @@
-// module.exports = userController;
 const Joi = require('joi');
-const bcrypt = require('bcrypt');
 const uuid = require('uuid').v4;
-const UserModel = require('../database/modules/user.model');
+const { userModel } = require('../database/models');
 const { ApiError, errorHandler, mailer } = require('../helpers');
+const responseNormalizer = require('../normalizers/response-normalizer');
 
-// const authRouter = Router();
-class userController {
-  constructor() { }
+class UserController {
+  constructor() {}
   async userRegister(req, res) {
     try {
       const { name, email, password } = req.body;
 
-      const user = await UserModel.findOne({ email });
+      const user = await userModel.findOne({ email });
 
       if (user) throw new ApiError(409, 'User with such email already exist');
 
-      const passwordHash = await UserModel.hashPassword(password);
+      const passwordHash = await userModel.hashPassword(password);
       const verificationToken = uuid();
 
-      const { _id } = await UserModel.create({
+      const { _id } = await userModel.create({
         name,
         email,
         passwordHash,
@@ -28,7 +26,7 @@ class userController {
 
       await mailer.sendVerificationMail(email, verificationToken);
 
-      res.status(201).send({ id: _id, name, email });
+      responseNormalizer(201, res, { id: _id, name, email });
     } catch (err) {
       errorHandler(req, res, err);
     }
@@ -40,7 +38,7 @@ class userController {
     try {
       const { email, password } = req.body;
 
-      const foundUser = await UserModel.findOne({ email });
+      const foundUser = await userModel.findOne({ email });
 
       if (!foundUser) {
         throw new ApiError(401, 'Email or password is wrong');
@@ -64,7 +62,7 @@ class userController {
     try {
       const { verificationToken } = req.params;
 
-      const foundUser = await UserModel.findOne({ verificationToken });
+      const foundUser = await userModel.findOne({ verificationToken });
 
       if (!foundUser) throw new ApiError(404, 'User is not found');
 
@@ -72,7 +70,7 @@ class userController {
 
       await foundUser.save();
 
-      res.status(200).send('User is successfully verified');
+      responseNormalizer(200, res, 'User is successfully verified');
     } catch (err) {
       errorHandler(req, res, err);
     }
@@ -97,4 +95,4 @@ class userController {
   }
 }
 
-module.exports = new userController();
+module.exports = new UserController();

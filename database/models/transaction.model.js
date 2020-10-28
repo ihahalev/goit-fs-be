@@ -4,7 +4,7 @@ const {
 } = mongoose;
 const { transactionCategories, transactionTypes } = require('../staticData');
 
-const TransactionSchema = new mongoose.Schema(
+const transactionSchema = new mongoose.Schema(
   {
     amount: { type: Number, required: true },
     transactionDate: { type: Date, required: true },
@@ -27,4 +27,4 @@ const TransactionSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-module.exports = mongoose.model('Transaction', TransactionSchema);
+module.exports = mongoose.model('Transaction', transactionSchema);

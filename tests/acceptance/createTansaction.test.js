@@ -6,10 +6,9 @@ const faker = require('faker');
 const mongoose = require('mongoose');
 
 const Server = require('../../server');
-const TransactionModel = require('../../database/models/transaction.model');
-const UserModel = require('../../database/models/user.model');
+const { transactionModel, userModel } = require('../../database/models');
 const configEnv = require('../../config.env');
-const userModel = require('../types/userModel');
+const userTestModel = require('../types/userModel');
 
 describe('POST /api/transactions', () => {
   let server;
@@ -17,13 +16,12 @@ describe('POST /api/transactions', () => {
   const financeServer = new Server();
 
   before(async () => {
-    server = await financeServer.start();
+    server = await financeServer.startTest();
   });
 
   after(async () => {
     sinon.restore();
     await mongoose.connection.close();
-    // process.exit(0);
   });
 
   it('Should throw 401 Unauthorized', async () => {
@@ -35,12 +33,12 @@ describe('POST /api/transactions', () => {
   });
 
   context('when authorized', () => {
-    const user = new userModel();
+    const user = new userTestModel();
     token = jwt.sign(faker.random.word(), configEnv.jwtPrivateKey);
     user.set(token);
 
     before(() => {
-      sinon.replace(UserModel, 'findById', sinon.fake.returns(user));
+      sinon.replace(userModel, 'findById', sinon.fake.returns(user));
     });
 
     afterEach(() => {
@@ -53,7 +51,7 @@ describe('POST /api/transactions', () => {
 
     it('Should throw 403 Forbidden', async () => {
       sinon.replace(
-        UserModel,
+        userModel,
         'findOne',
         sinon.fake.returns({ _id: 1, token }),
       );
@@ -67,7 +65,7 @@ describe('POST /api/transactions', () => {
 
     it('Should throw 400 Bad requiest', async () => {
       sinon.replace(
-        UserModel,
+        userModel,
         'findOne',
         sinon.fake.returns({ _id: 1, token, familyId: 1 }),
       );
@@ -82,7 +80,7 @@ describe('POST /api/transactions', () => {
     it('Should respond with 201 and create transaction in DB', async () => {
       const id = mongoose.Types.ObjectId();
       sinon.replace(
-        UserModel,
+        userModel,
         'findOne',
         sinon.fake.returns({ _id: id, token, familyId: 1 }),
       );
@@ -93,9 +91,9 @@ describe('POST /api/transactions', () => {
         .send({ amount: '12500' })
         .expect(201);
 
-      const { _id } = await TransactionModel.findOne({ userId: id });
+      const { _id } = await transactionModel.findOne({ userId: id });
       should.exist(_id);
-      await TransactionModel.findByIdAndDelete(_id);
+      await transactionModel.findByIdAndDelete(_id);
     });
   });
 });

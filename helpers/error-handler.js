@@ -5,11 +5,11 @@ const getLogger = require('./get-logger');
 const logger = getLogger('ErrorHandler');
 
 module.exports = (req, res, error) => {
-  // logger.error('------------------------');
-  // logger.error(error);
-  // logger.error('------------------------');
-  // logger.error(req.params, req.query, req.body);
-  // logger.error('=========================');
+  logger.error('------------------------');
+  logger.error(error);
+  logger.error('------------------------');
+  logger.error(req.params, req.query, req.body);
+  logger.error('=========================');
 
   if (error instanceof ApiError) {
     return responseNormalizer(error.status, res, {

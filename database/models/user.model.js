@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const joi = require('joi');
 const jsonWebToken = require('jsonwebtoken');
 const config = require('../../config.env');
-const { Timestamp, ObjectId } = require('mongodb');
+const { ObjectId } = require('mongodb');
 
 const UserSchema = new mongoose.Schema(
   {
