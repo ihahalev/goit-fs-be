@@ -30,7 +30,7 @@ class giftsController {
         { new: true },
       );
 
-      const { giftsForUnpacking } = familyUpdate;
+      const { giftsForUnpacking, giftsUnpacked } = familyUpdate;
 
       return res.status(200).send({
         gifts: {
