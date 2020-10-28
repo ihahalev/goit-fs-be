@@ -1,8 +1,10 @@
 const Joi = require('joi');
 const uuid = require('uuid').v4;
 const { userModel } = require('../database/models');
+// const { db } = require('../database/models/user.model');
 const { ApiError, errorHandler, mailer } = require('../helpers');
 const responseNormalizer = require('../normalizers/response-normalizer');
+const config = require('../config.env');
 
 class UserController {
   constructor() {}
@@ -52,11 +54,17 @@ class UserController {
       const token = await foundUser.generateAndSaveToken();
 
       const { _id, name, familyId } = foundUser;
-      res.send({ user: { id: _id, username: name, email, familyId }, token });
+
+      responseNormalizer(201, res, {
+        user: { id: _id, username: name, email, familyId },
+        token,
+      });
     } catch (err) {
       errorHandler(req, res, err);
     }
   }
+
+  //=============================================
 
   async verifyEmail(req, res, next) {
     try {
@@ -76,6 +84,8 @@ class UserController {
     }
   }
 
+  //==================================================
+
   validateUserObject(req, res, next) {
     try {
       const { error: validationError } = Joi.object({
@@ -85,12 +95,36 @@ class UserController {
       }).validate(req.body);
 
       if (validationError) {
-        throw new ApiError(400, 'Bad requiest', validationError);
+        throw new ApiError(400, 'Bad request', validationError);
       }
 
       next();
     } catch (e) {
       errorHandler(req, res, e);
+    }
+  }
+
+  //========================================
+
+  async logout(req, res) {
+    try {
+      const { activeToken, user } = req;
+      await userModel.update({_id:user.id }, { $pull: { tokens: { token: activeToken } } });
+      responseNormalizer(204, res, {});
+    } catch (err) {
+      errorHandler(req, res, err);
+    }
+  }
+
+  //==========================
+
+  async userCurrent(req, res) {
+    try {
+      const { _id, name, email, familyId } = req.user;
+
+      responseNormalizer(200, res, { id:_id, name, email, familyId });
+    } catch (err) {
+      errorHandler(req, res, err);
     }
   }
 }
