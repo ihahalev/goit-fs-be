@@ -109,7 +109,10 @@ class UserController {
   async logout(req, res) {
     try {
       const { activeToken, user } = req;
-      await userModel.update({_id:user.id }, { $pull: { tokens: { token: activeToken } } });
+      await userModel.update(
+        { _id: user.id },
+        { $pull: { tokens: { token: activeToken } } },
+      );
       responseNormalizer(204, res, {});
     } catch (err) {
       errorHandler(req, res, err);
@@ -118,11 +121,11 @@ class UserController {
 
   //==========================
 
-  async userCurrent(req, res) {
+  async getCurrentUser(req, res) {
     try {
       const { _id, name, email, familyId } = req.user;
 
-      responseNormalizer(200, res, { id:_id, name, email, familyId });
+      responseNormalizer(200, res, { id: _id, name, email, familyId });
     } catch (err) {
       errorHandler(req, res, err);
     }
