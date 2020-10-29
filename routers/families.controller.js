@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const { familyModel } = require('../database/models');
+const transactionModel = require('../database/models/transaction.model');
 const { ApiError, errorHandler, getLogger } = require('../helpers');
 const responseNormalizer = require('../normalizers/response-normalizer');
 
@@ -12,6 +13,10 @@ class FamilyController {
 
   get getCurrentFamily() {
     return this._currentFamily.bind(this);
+  }
+
+  get getStatsFlatFamily() {
+    return this._getStatsFlatFamily.bind(this);
   }
 
   get updateFamily() {
@@ -144,6 +149,39 @@ class FamilyController {
       errorHandler(req, res, err);
     }
   }
+
+  async _getStatsFlatFamily(req, res) {
+    try {
+      const { familyId } = req.user;
+
+      const familyCurrent = await familyModel.findById(familyId);
+      const transactionCurrent = await transactionModel.findById(familyId);
+
+      const { giftsForUnpacking } = familyCurrent;
+      const {
+        savingsPercentage,
+        savingsValue,
+        savingsInSquareMeters,
+        totalSquareMeters,
+        monthsLeftToSaveForFlat,
+        savingsForNextSquareMeterLeft } = transactionCurrent;
+
+      return responseNormalizer(200, res, {
+        savingsPercentage,
+        savingsValue,
+        savingsInSquareMeters,
+        totalSquareMeters,
+        monthsLeftToSaveForFlat,
+        savingsForNextSquareMeterLeft,
+        giftsForUnpacking,
+      });
+
+    } catch (err) {
+      logger.error(err);
+      errorHandler(req, res, err);
+    }
+  }
+
 
   validateCreatedFamilyObject(req, res, next) {
     try {

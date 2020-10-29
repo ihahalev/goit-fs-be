@@ -11,6 +11,8 @@ const {
   transactionsRouter,
 } = require('./routers');
 
+const getIncrementBalance = require('./cron/getIncrementBalance')
+
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./docs/index');
 const { mailer, getLogger } = require('./helpers');
@@ -28,6 +30,7 @@ module.exports = class Server {
     this.initServer();
     this.initMiddlewares();
     this.initRoutes();
+    getIncrementBalance();
     const retListen = this.startListening();
     process.on('SIGILL', () => {
       connection.close();
