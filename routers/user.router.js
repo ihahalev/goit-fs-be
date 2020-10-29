@@ -17,7 +17,7 @@ userRouter.post(
 
 userRouter.delete('/sign-out', authorization, userController.logout);
 
-userRouter.get('/current', authorization, userController.userCurrent);
+userRouter.get('/current', authorization, userController.getCurrentUser);
 
 userRouter.get('/verify/:verificationToken', userController.verifyEmail);
 
