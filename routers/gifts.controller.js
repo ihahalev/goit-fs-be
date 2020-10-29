@@ -25,7 +25,7 @@ class giftsController {
         familyId,
         {
           giftsForUnpacking: family.decrementGiftsForUnpacking(),
-          giftsUnpacked: family.incrementGiftsUnpacked(),
+          // giftsUnpacked: family.incrementGiftsUnpacked(),
         },
         { new: true },
       );

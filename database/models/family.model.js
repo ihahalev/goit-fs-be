@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const getIncrementBalance = require('../../cron/getIncrementBalance')
 
 const { Schema } = mongoose;
 
@@ -16,15 +17,16 @@ const familySchema = new Schema({
 );
 
 familySchema.method("decrementGiftsForUnpacking", function () {
-  this.giftsForUnpacking = this.giftsForUnpacking - 1;
 
-  return this.giftsForUnpacking;
+  if (this.giftsForUnpacking <= 0) {
+    return this.giftsForUnpacking = 0;
+  }
+
+  return this.giftsForUnpacking = this.giftsForUnpacking - 1;
 });
 
 familySchema.method("incrementGiftsUnpacked", function () {
-  this.giftsUnpacked = this.giftsUnpacked + 1;
-
-  return this.giftsUnpacked;
+  this.giftsUnpacked;
 });
 
 module.exports = mongoose.model("Family", familySchema);
