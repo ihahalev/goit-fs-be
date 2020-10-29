@@ -11,6 +11,8 @@ const {
   transactionsRouter,
 } = require('./routers');
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./docs/index');
 const { mailer, getLogger } = require('./helpers');
 const connection = require('./database/Connection');
 
@@ -53,6 +55,7 @@ module.exports = class Server {
     this.server.use(morgan('tiny'));
     this.server.use(express.json());
     this.server.use(cors({ origin: configEnv.allowedOrigin }));
+    this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   }
 
   initRoutes() {

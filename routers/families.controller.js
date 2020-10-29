@@ -34,7 +34,32 @@ class FamilyController {
       req.user.familyId = createdFamily._id;
       req.user.save();
 
-      return responseNormalizer(201, res, createdFamily);
+      const {
+        balance,
+        flatPrice,
+        flatSquareMeters,
+        totalSalary,
+        passiveIncome,
+        incomePercentageToSavings,
+        giftsUnpacked,
+        giftsForUnpacking,
+      } = createdFamily;
+
+      return responseNormalizer(201, res, {
+        info: {
+          balance,
+          flatPrice,
+          flatSquareMeters,
+          totalSalary,
+          passiveIncome,
+          incomePercentageToSavings,
+        },
+        gifts: {
+          giftsUnpacked,
+          giftsForUnpacking,
+        }
+      });
+
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
@@ -47,7 +72,32 @@ class FamilyController {
 
       const currentFamily = await familyModel.findById(familyId);
 
-      return responseNormalizer(200, res, currentFamily);
+      const { balance,
+        flatPrice,
+        flatSquareMeters,
+        totalSalary,
+        passiveIncome,
+        incomePercentageToSavings,
+        giftsUnpacked,
+        giftsForUnpacking,
+      } = currentFamily;
+
+      return responseNormalizer(200, res, {
+        info: {
+          balance,
+          flatPrice,
+          flatSquareMeters,
+          totalSalary,
+          passiveIncome,
+          incomePercentageToSavings,
+        },
+        gifts: {
+          giftsUnpacked,
+          giftsForUnpacking,
+        }
+      });
+
+
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
@@ -64,7 +114,31 @@ class FamilyController {
         { new: true },
       );
 
-      return responseNormalizer(200, res, familyToUpdate);
+      const { balance,
+        flatPrice,
+        flatSquareMeters,
+        totalSalary,
+        passiveIncome,
+        incomePercentageToSavings,
+        giftsUnpacked,
+        giftsForUnpacking,
+      } = familyToUpdate;
+
+      return responseNormalizer(200, res, {
+        info: {
+          balance,
+          flatPrice,
+          flatSquareMeters,
+          totalSalary,
+          passiveIncome,
+          incomePercentageToSavings,
+        },
+        gifts: {
+          giftsUnpacked,
+          giftsForUnpacking,
+        }
+      });
+
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
