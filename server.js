@@ -13,6 +13,8 @@ const {
 
 const getIncrementBalance = require('./cron/getIncrementBalance')
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./docs/index');
 const { mailer, getLogger } = require('./helpers');
 const connection = require('./database/Connection');
 
@@ -20,15 +22,6 @@ const logger = getLogger('Server');
 module.exports = class Server {
   constructor() {
     this.server = null;
-  }
-
-  async startTest() {
-    await mailer.init();
-    await connection.connect();
-    this.initServer();
-    this.initMiddlewares();
-    this.initRoutes();
-
   }
 
   async start() {
@@ -57,6 +50,7 @@ module.exports = class Server {
     this.server.use(morgan('tiny'));
     this.server.use(express.json());
     this.server.use(cors({ origin: configEnv.allowedOrigin }));
+    this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   }
 
   initRoutes() {

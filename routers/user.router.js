@@ -1,6 +1,6 @@
 const express = require('express');
-const userController = require('./user.controller');
 const authorization = require('../middlewares/auth');
+const userController = require('./user.controller');
 const userRouter = express.Router();
 
 userRouter.post(
@@ -14,6 +14,10 @@ userRouter.post(
   userController.validateUserObject,
   userController.userLogin,
 );
+
+userRouter.delete('/sign-out', authorization, userController.logout);
+
+userRouter.get('/current', authorization, userController.getCurrentUser);
 
 userRouter.get('/verify/:verificationToken', userController.verifyEmail);
 

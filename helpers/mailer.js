@@ -24,9 +24,10 @@ class Mailer {
       from: config.mail.auth.user,
       to: userEmail,
       subject: 'Verification Email',
-      html: `<a href="${config.srvUrl}/api/users/verify/${token}">Verify email</a>`,
+      html: `Follow the <a href="${config.srvUrl}/api/users/verify/${token}">link</a> to confirm registration`,
     });
   }
 }
+// Follow the link to confirm your registration and zologintes
 
 module.exports = new Mailer();
