@@ -1,11 +1,7 @@
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 
-const {
-  transactionModel,
-  userModel,
-  familyModel,
-} = require('../database/models');
+const { transactionModel, familyModel } = require('../database/models');
 const { errorHandler, ApiError } = require('../helpers');
 const responseNormalizer = require('../normalizers/response-normalizer');
 
@@ -72,8 +68,8 @@ class TransactionController {
 
   async familyAuthorization(req, res, next) {
     try {
-      const user = await userModel.findById(req.user);
-      if (!user.familyId) {
+      const { familyId } = req.user;
+      if (!familyId) {
         throw new ApiError(403, 'Forbidden', {
           message: 'Not part of a Family',
         });
