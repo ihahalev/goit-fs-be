@@ -15,16 +15,27 @@ const familySchema = new Schema({
   { timestamps: true }
 );
 
-familySchema.method("decrementGiftsForUnpacking", function () {
+familySchema.method("updateGiftsUnpack", function () {
+
+  if (this.giftsForUnpacking <= 0) {
+    this.giftsForUnpacking = 0;
+
+    this.giftsUnpacked = Math.floor((this.balance * this.flatSquareMeters / this.flatPrice));
+
+    return {
+      forUnpacking: this.giftsForUnpacking,
+      unpacked: this.giftsUnpacked,
+    }
+  }
+
   this.giftsForUnpacking = this.giftsForUnpacking - 1;
-
-  return this.giftsForUnpacking;
-});
-
-familySchema.method("incrementGiftsUnpacked", function () {
   this.giftsUnpacked = this.giftsUnpacked + 1;
 
-  return this.giftsUnpacked;
+  return {
+    forUnpacking: this.giftsForUnpacking,
+    unpacked: this.giftsUnpacked,
+  }
+
 });
 
 module.exports = mongoose.model("Family", familySchema);
