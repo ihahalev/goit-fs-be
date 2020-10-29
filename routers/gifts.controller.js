@@ -5,7 +5,7 @@ const responseNormalizer = require('../normalizers/response-normalizer');
 const logger = getLogger('gifts');
 
 class giftsController {
-  constructor() {}
+  constructor() { }
 
   get unpackGift() {
     return this._unpackGift.bind(this);
@@ -30,11 +30,15 @@ class giftsController {
         { new: true },
       );
 
-      const { giftsForUnpacking } = familyUpdate;
+      const { giftsForUnpacking, giftsUnpacked } = familyUpdate;
 
       return responseNormalizer(200, res, {
-        giftsForUnpacking,
+        gifts: {
+          giftsUnpacked,
+          giftsForUnpacking,
+        }
       });
+
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
