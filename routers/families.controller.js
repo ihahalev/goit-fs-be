@@ -115,7 +115,7 @@ class FamilyController {
 
       const monthsLeftToSaveForFlat = Math.ceil((flatPrice - balance) / ((totalSalary + passiveIncome) * incomePercentageToSavings / 100))
 
-      const savingsForNextSquareMeterLeft = totalSquareMeters - savingsInSquareMeters;
+      const savingsForNextSquareMeterLeft = costSquareMeter - balance % costSquareMeter;
 
       return responseNormalizer(200, res, {
         savingsPercentage,
