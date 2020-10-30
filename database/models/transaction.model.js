@@ -16,7 +16,6 @@ const transactionSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: transactionCategories,
       default: transactionCategories[0],
       required: true,
     },
@@ -35,9 +34,7 @@ transactionSchema.static('getFamilyAnnualReport', async function (
   const startMonth = String(month + 1).padStart(2, '0');
   const endMonth = String(month).padStart(2, '0');
   const startDate = `${startYear}-${startMonth}-01`;
-  console.log(startDate);
   const endDate = `${startYear - 1}-${endMonth}-01`;
-  console.log(endDate);
   return this.aggregate([
     {
       $match: {
@@ -55,8 +52,6 @@ transactionSchema.static('getFamilyAnnualReport', async function (
     {
       $addFields: {
         transactionDate: '$transactionDate',
-        year: { $year: '$transactionDate' },
-        month: { $month: '$transactionDate' },
         incomeAmount: {
           $cond: [{ $eq: ['$type', 'INCOME'] }, '$amount', 0],
         },
@@ -105,6 +100,71 @@ transactionSchema.static('getFamilyAnnualReport', async function (
     },
     { $sort: { _id: -1 } },
   ]);
+});
+
+transactionSchema.static('monthlyAccrual', async function (
+  income,
+  percent,
+  userId,
+  familyId,
+) {
+  const date = new Date();
+  const month = String(date.getMonth()).padStart(2, '0');
+  const startDate = `${date.getFullYear()}-${month}-01`;
+  const [{ totalSavings }] = await this.aggregate([
+    {
+      $match: {
+        familyId: `${familyId}`,
+      },
+    },
+    {
+      $match: {
+        transactionDate: {
+          $lt: new Date(`${startDate}`),
+        },
+      },
+    },
+    {
+      $addFields: {
+        transactionDate: '$transactionDate',
+        incomeAmount: {
+          $cond: [{ $eq: ['$type', 'INCOME'] }, '$amount', 0],
+        },
+        expenses: {
+          $cond: [{ $eq: ['$type', 'EXPENSE'] }, '$amount', 0],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        incomeAmount: { $sum: '$incomeAmount' },
+        expenses: { $sum: '$expenses' },
+        totalSavings: { $sum: { $subtract: ['$incomeAmount', '$expenses'] } },
+      },
+    },
+  ]);
+
+  await this.create({
+    amount: income,
+    type: 'INCOME',
+    category: 'Доход',
+    comment: 'Ежемесячное начисление',
+    familyId,
+    userId,
+    transactionDate: Date.now(),
+  });
+  await this.create({
+    amount: percent,
+    type: 'PERCENT',
+    category: 'Ожидаемые сбережения',
+    comment: 'Процент от дохода',
+    familyId,
+    userId,
+    transactionDate: Date.now(),
+  });
+
+  return totalSavings;
 });
 
 module.exports = mongoose.model('Transaction', transactionSchema);
