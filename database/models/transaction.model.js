@@ -10,13 +10,13 @@ const transactionSchema = new mongoose.Schema(
     transactionDate: { type: Date, required: true },
     type: {
       type: String,
-      enum: transactionTypes,
+      // enum: transactionTypes,
       default: transactionTypes[0],
       required: true,
     },
     category: {
       type: String,
-      enum: transactionCategories,
+      // enum: transactionCategories,
       default: transactionCategories[0],
       required: true,
     },
@@ -35,9 +35,7 @@ transactionSchema.static('getFamilyAnnualReport', async function (
   const startMonth = String(month + 1).padStart(2, '0');
   const endMonth = String(month).padStart(2, '0');
   const startDate = `${startYear}-${startMonth}-01`;
-  console.log(startDate);
   const endDate = `${startYear - 1}-${endMonth}-01`;
-  console.log(endDate);
   return this.aggregate([
     {
       $match: {
@@ -55,8 +53,6 @@ transactionSchema.static('getFamilyAnnualReport', async function (
     {
       $addFields: {
         transactionDate: '$transactionDate',
-        year: { $year: '$transactionDate' },
-        month: { $month: '$transactionDate' },
         incomeAmount: {
           $cond: [{ $eq: ['$type', 'INCOME'] }, '$amount', 0],
         },
@@ -104,6 +100,66 @@ transactionSchema.static('getFamilyAnnualReport', async function (
       },
     },
     { $sort: { _id: -1 } },
+  ]);
+});
+
+transactionSchema.static('monthlyAccrual', async function (income, percent) {
+  await this.create({
+    // transactionSchema.method('monthlyAccrual', async function (income, percent) {
+    //   await this.constructor.create({
+    amount: income,
+    type: 'INCOME',
+    category: 'Доход',
+    comment: 'Ежемесячное начисление',
+    // familyId: this.familyId,
+    // userId: this._id,
+    transactionDate: Date.now() + 2 * 60 * 60 * 1e3,
+  });
+  await this.create({
+    amount: percent,
+    type: 'PERCENT',
+    category: 'Ожидаемые сбережения',
+    comment: 'Процент от дохода',
+    // familyId: this.familyId,
+    // userId: this._id,
+    transactionDate: Date.now() + 2 * 60 * 60 * 1e3,
+  });
+  const date = new Date();
+  const month = String(date.getUTCMonth()).padStart(2, '0');
+  const startDate = `${date.getUTCFullYear()}-${month}-01`;
+  console.log(startDate);
+  return this.aggregate([
+    // {
+    //   $match: {
+    //     familyId: `${familyId}`,
+    //   },
+    // },
+    {
+      $match: {
+        transactionDate: {
+          $lt: new Date(`${startDate}`),
+        },
+      },
+    },
+    {
+      $addFields: {
+        transactionDate: '$transactionDate',
+        incomeAmount: {
+          $cond: [{ $eq: ['$type', 'INCOME'] }, '$amount', 0],
+        },
+        expenses: {
+          $cond: [{ $eq: ['$type', 'EXPENSE'] }, '$amount', 0],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        incomeAmount: { $sum: '$incomeAmount' },
+        expenses: { $sum: '$expenses' },
+        totalSavings: { $sum: { $subtract: ['$incomeAmount', '$expenses'] } },
+      },
+    },
   ]);
 });
 

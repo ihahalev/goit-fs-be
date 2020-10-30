@@ -66,6 +66,89 @@ class TransactionController {
     }
   }
 
+  async collect(req, res) {
+    try {
+      const [{ totalSavings }] = await transactionModel.monthlyAccrual(
+        70000,
+        95,
+      );
+      // const transes = await transactionModel.aggregate([
+      //   {
+      //     $addFields: {
+      //       transactionDate: '$transactionDate',
+      //       // day: { $dayOfMonth: '$transactionDate' },
+      //       // hour: { $hour: '$transactionDate' },
+      //       // amount: '$amount',
+      //       year: { $year: '$transactionDate' },
+      //       month: { $month: '$transactionDate' },
+      //       incomeAmount: {
+      //         $cond: [{ $eq: ['$type', 'INCOME'] }, '$amount', 0],
+      //       },
+      //       expenses: {
+      //         $cond: [{ $eq: ['$type', 'EXPENSE'] }, '$amount', 0],
+      //       },
+      //       percentAmount: {
+      //         $cond: [{ $eq: ['$type', 'PERCENT'] }, '$amount', 0],
+      //       },
+      //     },
+      //   },
+      //   {
+      //     $match: {
+      //       transactionDate: {
+      //         $gte: new Date('2019-10-01'),
+      //         $lt: new Date('2020-10-01'),
+      //       },
+      //     },
+      //   },
+      //   {
+      //     $group: {
+      //       _id: {
+      //         $dateToString: {
+      //           format: '%Y-%m',
+      //           date: '$transactionDate',
+      //         },
+      //       },
+      //       incomeAmount: { $sum: '$incomeAmount' },
+      //       expenses: { $sum: '$expenses' },
+      //       percentAmount: { $sum: '$percentAmount' },
+      //     },
+      //   },
+      //   {
+      //     $addFields: {
+      //       savings: { $subtract: ['$incomeAmount', '$expenses'] },
+      //       expectedSavings: {
+      //         $multiply: ['$incomeAmount', '$percentAmount', 0.01],
+      //       },
+      //       // year: {
+      //       //   $dateFromString: {
+      //       //     format: '%Y-%m',
+      //       //     date: '$_id',
+      //       //   },
+      //       // },
+      //       year: {
+      //         $year: {
+      //           date: {
+      //             $dateFromString: { dateString: { $concat: ['$_id', '-01'] } },
+      //           },
+      //         },
+      //       },
+      //       month: {
+      //         $month: {
+      //           date: {
+      //             $dateFromString: { dateString: { $concat: ['$_id', '-01'] } },
+      //           },
+      //         },
+      //       },
+      //     },
+      //   },
+      //   { $sort: { _id: -1 } },
+      // ]);
+      return responseNormalizer(200, res, { totalSavings });
+    } catch (e) {
+      errorHandler(req, res, e);
+    }
+  }
+
   async familyAuthorization(req, res, next) {
     try {
       const { familyId } = req.user;
