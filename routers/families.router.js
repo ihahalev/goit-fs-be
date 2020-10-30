@@ -14,7 +14,7 @@ familiesRouter.get("/current", authorization,
 );
 
 familiesRouter.get("/stats/flat", authorization,
-  familiesController._getStatsFlatFamily,
+  familiesController.getStatsFlatFamily,
 );
 
 familiesRouter.put("/", authorization,

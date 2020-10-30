@@ -1,29 +1,12 @@
 const Joi = require('joi');
 const { familyModel } = require('../database/models');
-const transactionModel = require('../database/models/transaction.model');
 const { ApiError, errorHandler, getLogger } = require('../helpers');
 const responseNormalizer = require('../normalizers/response-normalizer');
 
 const logger = getLogger('FamiliesController');
 
 class FamilyController {
-  get createFamily() {
-    return this._createFamily.bind(this);
-  }
-
-  get getCurrentFamily() {
-    return this._currentFamily.bind(this);
-  }
-
-  get getStatsFlatFamily() {
-    return this._getStatsFlatFamily.bind(this);
-  }
-
-  get updateFamily() {
-    return this._updateFamily.bind(this);
-  }
-
-  async _createFamily(req, res) {
+  async createFamily(req, res) {
     try {
       const { familyId } = req.user;
 
@@ -32,7 +15,7 @@ class FamilyController {
           409,
           'user already created family/is a part of family',
         );
-      }
+      };
 
       const createdFamily = await familyModel.create(req.body);
 
@@ -68,10 +51,10 @@ class FamilyController {
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
-    }
-  }
+    };
+  };
 
-  async _currentFamily(req, res) {
+  async getCurrentFamily(req, res) {
     try {
       const { familyId } = req.user;
 
@@ -106,10 +89,45 @@ class FamilyController {
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
-    }
-  }
+    };
+  };
 
-  async _updateFamily(req, res) {
+  async getStatsFlatFamily(req, res) {
+    try {
+      const { familyId } = req.user;
+
+      const familyCurrent = await familyModel.findById(familyId);
+
+      const { giftsUnpacked, giftsForUnpacking, flatPrice, balance, flatSquareMeters, totalSalary, passiveIncome, incomePercentageToSavings } = familyCurrent;
+
+      const savingsPercentage = Math.ceil((balance * 100) / (flatPrice));
+      const savingsValue = balance;
+      const savingsInSquareMeters = giftsUnpacked;
+      const totalSquareMeters = flatSquareMeters;
+
+      const costSquareMeter = Math.ceil(flatPrice / flatSquareMeters);
+
+      const monthsLeftToSaveForFlat = Math.ceil((flatPrice - balance) / ((totalSalary + passiveIncome) * incomePercentageToSavings / 100))
+
+      const savingsForNextSquareMeterLeft = Math.ceil((costSquareMeter - balance) * 100 / costSquareMeter);
+
+      return responseNormalizer(200, res, {
+        savingsPercentage,
+        savingsValue,
+        savingsInSquareMeters,
+        totalSquareMeters,
+        monthsLeftToSaveForFlat,
+        savingsForNextSquareMeterLeft,
+        giftsForUnpacking,
+      });
+
+    } catch (err) {
+      logger.error(err);
+      errorHandler(req, res, err);
+    };
+  };
+
+  async updateFamily(req, res) {
     try {
       const { familyId } = req.user;
 
@@ -141,47 +159,14 @@ class FamilyController {
         gifts: {
           giftsUnpacked,
           giftsForUnpacking,
-        }
+        },
       });
 
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
-    }
-  }
-
-  async _getStatsFlatFamily(req, res) {
-    try {
-      const { familyId } = req.user;
-
-      const familyCurrent = await familyModel.findById(familyId);
-      const transactionCurrent = await transactionModel.findById(familyId);
-
-      const { giftsForUnpacking } = familyCurrent;
-      const {
-        savingsPercentage,
-        savingsValue,
-        savingsInSquareMeters,
-        totalSquareMeters,
-        monthsLeftToSaveForFlat,
-        savingsForNextSquareMeterLeft } = transactionCurrent;
-
-      return responseNormalizer(200, res, {
-        savingsPercentage,
-        savingsValue,
-        savingsInSquareMeters,
-        totalSquareMeters,
-        monthsLeftToSaveForFlat,
-        savingsForNextSquareMeterLeft,
-        giftsForUnpacking,
-      });
-
-    } catch (err) {
-      logger.error(err);
-      errorHandler(req, res, err);
-    }
-  }
-
+    };
+  };
 
   validateCreatedFamilyObject(req, res, next) {
     try {
@@ -196,13 +181,13 @@ class FamilyController {
 
       if (validationError) {
         throw new ApiError(400, 'Bad request', validationError);
-      }
+      };
 
       next();
     } catch (e) {
       errorHandler(req, res, e);
-    }
-  }
+    };
+  };
 
   validateUpdateFamilyObject(req, res, next) {
     try {
@@ -221,8 +206,8 @@ class FamilyController {
       next();
     } catch (e) {
       errorHandler(req, res, e);
-    }
-  }
-}
+    };
+  };
+};
 
 module.exports = new FamilyController();
