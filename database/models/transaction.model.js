@@ -10,13 +10,12 @@ const transactionSchema = new mongoose.Schema(
     transactionDate: { type: Date, required: true },
     type: {
       type: String,
-      // enum: transactionTypes,
+      enum: transactionTypes,
       default: transactionTypes[0],
       required: true,
     },
     category: {
       type: String,
-      // enum: transactionCategories,
       default: transactionCategories[0],
       required: true,
     },
@@ -103,37 +102,21 @@ transactionSchema.static('getFamilyAnnualReport', async function (
   ]);
 });
 
-transactionSchema.static('monthlyAccrual', async function (income, percent) {
-  await this.create({
-    // transactionSchema.method('monthlyAccrual', async function (income, percent) {
-    //   await this.constructor.create({
-    amount: income,
-    type: 'INCOME',
-    category: 'Доход',
-    comment: 'Ежемесячное начисление',
-    // familyId: this.familyId,
-    // userId: this._id,
-    transactionDate: Date.now() + 2 * 60 * 60 * 1e3,
-  });
-  await this.create({
-    amount: percent,
-    type: 'PERCENT',
-    category: 'Ожидаемые сбережения',
-    comment: 'Процент от дохода',
-    // familyId: this.familyId,
-    // userId: this._id,
-    transactionDate: Date.now() + 2 * 60 * 60 * 1e3,
-  });
+transactionSchema.static('monthlyAccrual', async function (
+  income,
+  percent,
+  userId,
+  familyId,
+) {
   const date = new Date();
-  const month = String(date.getUTCMonth()).padStart(2, '0');
-  const startDate = `${date.getUTCFullYear()}-${month}-01`;
-  console.log(startDate);
-  return this.aggregate([
-    // {
-    //   $match: {
-    //     familyId: `${familyId}`,
-    //   },
-    // },
+  const month = String(date.getMonth()).padStart(2, '0');
+  const startDate = `${date.getFullYear()}-${month}-01`;
+  const [{ totalSavings }] = await this.aggregate([
+    {
+      $match: {
+        familyId: `${familyId}`,
+      },
+    },
     {
       $match: {
         transactionDate: {
@@ -161,6 +144,27 @@ transactionSchema.static('monthlyAccrual', async function (income, percent) {
       },
     },
   ]);
+
+  await this.create({
+    amount: income,
+    type: 'INCOME',
+    category: 'Доход',
+    comment: 'Ежемесячное начисление',
+    familyId,
+    userId,
+    transactionDate: Date.now(),
+  });
+  await this.create({
+    amount: percent,
+    type: 'PERCENT',
+    category: 'Ожидаемые сбережения',
+    comment: 'Процент от дохода',
+    familyId,
+    userId,
+    transactionDate: Date.now(),
+  });
+
+  return totalSavings;
 });
 
 module.exports = mongoose.model('Transaction', transactionSchema);

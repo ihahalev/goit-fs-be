@@ -21,10 +21,4 @@ router.get(
   transactionsController.getAnnualStats,
 );
 
-router.get(
-  '/collect',
-
-  transactionsController.collect,
-);
-
 module.exports = router;
