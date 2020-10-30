@@ -121,6 +121,39 @@ const familyEndpoints = {
       },
     },
   },
+
+  '/families/stats/flat': {
+    get: {
+      tags: ['families'],
+      summary: 'Get info stats of flat from family document',
+      description: 'families router',
+      operationId: 'getLoggedFamilyStatsFlat',
+      produces: ['application/json'],
+      parameters: [
+        {
+          in: 'header',
+          name: 'Authorization',
+          description: 'Authorization',
+          required: true,
+          type: 'string',
+        }
+      ],
+      responses: {
+        '401': {
+          description: 'User not authorized',
+        },
+        '403': {
+          description: 'user not a member of family',
+        },
+        '200': {
+          description: 'Flat stats as for today',
+          schema: {
+            $ref: '#/definitions/FamilyStats',
+          },
+        },
+      },
+    },
+  },
 };
 
 const familyDefinitions = {
@@ -167,6 +200,42 @@ const familyDefinitions = {
     },
   },
 
+  FamilyStats: {
+    type: 'object',
+    properties: {
+      info: {
+        type: 'object',
+        properties: {
+          savingsPercentage: {
+            type: 'number',
+          },
+          savingsValue: {
+            type: 'number',
+          },
+          savingsInSquareMeters: {
+            type: 'number',
+          },
+          totalSquareMeters: {
+            type: 'number',
+          },
+          monthsLeftToSaveForFlat: {
+            type: 'number',
+          },
+          savingsForNextSquareMeterLeft: {
+            type: 'number',
+          },
+          giftsForUnpacking: {
+            type: 'number',
+          },
+        }
+      },
+
+    },
+    xml: {
+      name: 'FamilyStats',
+    },
+  },
+
   FamilyCreatedRequest: {
     type: 'object',
     properties: {
@@ -193,6 +262,7 @@ const familyDefinitions = {
       name: 'FamilyRequest',
     },
   },
+
   FamilyUpdateRequest: {
     type: 'object',
     properties: {

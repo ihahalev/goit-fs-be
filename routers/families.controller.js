@@ -98,18 +98,24 @@ class FamilyController {
 
       const familyCurrent = await familyModel.findById(familyId);
 
-      const { giftsUnpacked, giftsForUnpacking, flatPrice, balance, flatSquareMeters, totalSalary, passiveIncome, incomePercentageToSavings } = familyCurrent;
+      if (!familyCurrent) {
+        throw new ApiError(
+          403,
+          'user not a member of family',
+        );
+      };
 
-      const savingsPercentage = Math.ceil((balance * 100) / (flatPrice));
+      const { giftsForUnpacking, flatPrice, balance, flatSquareMeters, totalSalary, passiveIncome, incomePercentageToSavings } = familyCurrent;
+
+      const savingsPercentage = Math.floor((balance * 100) / (flatPrice));
       const savingsValue = balance;
-      const savingsInSquareMeters = giftsUnpacked;
-      const totalSquareMeters = flatSquareMeters;
-
       const costSquareMeter = Math.ceil(flatPrice / flatSquareMeters);
+      const savingsInSquareMeters = Math.floor(balance / costSquareMeter);
+      const totalSquareMeters = flatSquareMeters;
 
       const monthsLeftToSaveForFlat = Math.ceil((flatPrice - balance) / ((totalSalary + passiveIncome) * incomePercentageToSavings / 100))
 
-      const savingsForNextSquareMeterLeft = Math.ceil((costSquareMeter - balance) * 100 / costSquareMeter);
+      const savingsForNextSquareMeterLeft = totalSquareMeters - savingsInSquareMeters;
 
       return responseNormalizer(200, res, {
         savingsPercentage,
