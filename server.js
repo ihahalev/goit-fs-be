@@ -11,7 +11,7 @@ const {
   transactionsRouter,
 } = require('./routers');
 
-
+const getIncrementBalance = require('./cron/getIncrementBalance')
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./docs/index');
@@ -30,7 +30,7 @@ module.exports = class Server {
     this.initServer();
     this.initMiddlewares();
     this.initRoutes();
-
+    this.initCron();
     const retListen = this.startListening();
     process.on('SIGILL', () => {
       connection.close();
@@ -51,6 +51,10 @@ module.exports = class Server {
     this.server.use(express.json());
     this.server.use(cors({ origin: configEnv.allowedOrigin }));
     this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  }
+
+  initCron() {
+    getIncrementBalance();
   }
 
   initRoutes() {
