@@ -5,11 +5,11 @@ class GoogleController {
   async findOrCreate(profile, callback) {
     try {
       const { email } = profile._json;
-      const userName = email.substring(0, email.indexOf('@'));
+      const displayName = email.substring(0, email.indexOf('@'));
       const foundUser = await userModel.findOne({ email });
       if (!foundUser) {
         const newUser = await userModel.create({
-          name: userName,
+          name: displayName,
           email,
           verificationToken: null,
         });
@@ -25,7 +25,7 @@ class GoogleController {
   }
 
   redirectGoogle(req, res) {
-    res.status(201).send({ token: req.user.token }).redirect('/');
+    res.redirect(`/?token=${req.user.token}`);
   }
 }
 module.exports = new GoogleController();
