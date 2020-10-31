@@ -36,11 +36,11 @@ transactionSchema.static('getFamilyAnnualReport', async function (
   const startDate = `${startYear}-${startMonth}-01`;
   const endDate = `${startYear - 1}-${endMonth}-01`;
   return this.aggregate([
-    {
-      $match: {
-        familyId: `${familyId}`,
-      },
-    },
+    // {
+    //   $match: {
+    //     familyId: `${familyId}`,
+    //   },
+    // },
     {
       $match: {
         transactionDate: {
