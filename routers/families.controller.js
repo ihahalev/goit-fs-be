@@ -6,19 +6,7 @@ const responseNormalizer = require('../normalizers/response-normalizer');
 const logger = getLogger('FamiliesController');
 
 class FamilyController {
-  get createFamily() {
-    return this._createFamily.bind(this);
-  }
-
-  get getCurrentFamily() {
-    return this._currentFamily.bind(this);
-  }
-
-  get updateFamily() {
-    return this._updateFamily.bind(this);
-  }
-
-  async _createFamily(req, res) {
+  async createFamily(req, res) {
     try {
       const { familyId } = req.user;
 
@@ -27,34 +15,125 @@ class FamilyController {
           409,
           'user already created family/is a part of family',
         );
-      }
+      };
 
       const createdFamily = await familyModel.create(req.body);
 
       req.user.familyId = createdFamily._id;
       req.user.save();
 
-      return responseNormalizer(201, res, createdFamily);
+      const {
+        balance,
+        flatPrice,
+        flatSquareMeters,
+        totalSalary,
+        passiveIncome,
+        incomePercentageToSavings,
+        giftsUnpacked,
+        giftsForUnpacking,
+      } = createdFamily;
+
+      return responseNormalizer(201, res, {
+        info: {
+          balance,
+          flatPrice,
+          flatSquareMeters,
+          totalSalary,
+          passiveIncome,
+          incomePercentageToSavings,
+        },
+        gifts: {
+          giftsUnpacked,
+          giftsForUnpacking,
+        }
+      });
+
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
-    }
-  }
+    };
+  };
 
-  async _currentFamily(req, res) {
+  async getCurrentFamily(req, res) {
     try {
       const { familyId } = req.user;
 
       const currentFamily = await familyModel.findById(familyId);
 
-      return responseNormalizer(200, res, currentFamily);
+      const { balance,
+        flatPrice,
+        flatSquareMeters,
+        totalSalary,
+        passiveIncome,
+        incomePercentageToSavings,
+        giftsUnpacked,
+        giftsForUnpacking,
+      } = currentFamily;
+
+      return responseNormalizer(200, res, {
+        info: {
+          balance,
+          flatPrice,
+          flatSquareMeters,
+          totalSalary,
+          passiveIncome,
+          incomePercentageToSavings,
+        },
+        gifts: {
+          giftsUnpacked,
+          giftsForUnpacking,
+        }
+      });
+
+
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
-    }
-  }
+    };
+  };
 
-  async _updateFamily(req, res) {
+  async getStatsFlatFamily(req, res) {
+    try {
+      const { familyId } = req.user;
+
+      const familyCurrent = await familyModel.findById(familyId);
+
+      if (!familyCurrent) {
+        throw new ApiError(
+          403,
+          'user not a member of family',
+        );
+      };
+
+      const { giftsForUnpacking, flatPrice, balance, flatSquareMeters, totalSalary, passiveIncome, incomePercentageToSavings } = familyCurrent;
+
+      const savingsPercentage = Math.floor((balance * 100) / (flatPrice));
+      const savingsValue = balance;
+      const costSquareMeter = Math.ceil(flatPrice / flatSquareMeters);
+      const savingsInSquareMeters = Math.floor(balance / costSquareMeter);
+      const totalSquareMeters = flatSquareMeters;
+
+      const monthsLeftToSaveForFlat = Math.ceil((flatPrice - balance) / ((totalSalary + passiveIncome) * incomePercentageToSavings / 100))
+
+      const savingsForNextSquareMeterLeft = costSquareMeter - balance % costSquareMeter;
+
+      return responseNormalizer(200, res, {
+        savingsPercentage,
+        savingsValue,
+        savingsInSquareMeters,
+        totalSquareMeters,
+        monthsLeftToSaveForFlat,
+        savingsForNextSquareMeterLeft,
+        giftsForUnpacking,
+      });
+
+    } catch (err) {
+      logger.error(err);
+      errorHandler(req, res, err);
+    };
+  };
+
+  async updateFamily(req, res) {
     try {
       const { familyId } = req.user;
 
@@ -64,12 +143,36 @@ class FamilyController {
         { new: true },
       );
 
-      return responseNormalizer(200, res, familyToUpdate);
+      const { balance,
+        flatPrice,
+        flatSquareMeters,
+        totalSalary,
+        passiveIncome,
+        incomePercentageToSavings,
+        giftsUnpacked,
+        giftsForUnpacking,
+      } = familyToUpdate;
+
+      return responseNormalizer(200, res, {
+        info: {
+          balance,
+          flatPrice,
+          flatSquareMeters,
+          totalSalary,
+          passiveIncome,
+          incomePercentageToSavings,
+        },
+        gifts: {
+          giftsUnpacked,
+          giftsForUnpacking,
+        },
+      });
+
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
-    }
-  }
+    };
+  };
 
   validateCreatedFamilyObject(req, res, next) {
     try {
@@ -84,13 +187,13 @@ class FamilyController {
 
       if (validationError) {
         throw new ApiError(400, 'Bad request', validationError);
-      }
+      };
 
       next();
     } catch (e) {
       errorHandler(req, res, e);
-    }
-  }
+    };
+  };
 
   validateUpdateFamilyObject(req, res, next) {
     try {
@@ -109,8 +212,8 @@ class FamilyController {
       next();
     } catch (e) {
       errorHandler(req, res, e);
-    }
-  }
-}
+    };
+  };
+};
 
 module.exports = new FamilyController();

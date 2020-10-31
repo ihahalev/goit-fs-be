@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema(
       required: true,
     },
     passwordHash: { type: String },
-    familyId: { type: ObjectId, default: null },
+    familyId: { type: ObjectId, ref: 'Family', default: null },
     tokens: [
       {
         token: { type: String, required: true },

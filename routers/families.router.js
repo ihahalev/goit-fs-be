@@ -13,6 +13,10 @@ familiesRouter.get("/current", authorization,
   familiesController.getCurrentFamily,
 );
 
+familiesRouter.get("/stats/flat", authorization,
+  familiesController.getStatsFlatFamily,
+);
+
 familiesRouter.put("/", authorization,
   familiesController.validateUpdateFamilyObject,
   familiesController.updateFamily,

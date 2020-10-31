@@ -11,6 +11,10 @@ const {
   transactionsRouter,
 } = require('./routers');
 
+const getIncrementBalance = require('./cron/getIncrementBalance')
+
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./docs/index');
 const { mailer, getLogger } = require('./helpers');
 const connection = require('./database/Connection');
 
@@ -20,20 +24,13 @@ module.exports = class Server {
     this.server = null;
   }
 
-  async startTest() {
-    await mailer.init();
-    await connection.connect();
-    this.initServer();
-    this.initMiddlewares();
-    this.initRoutes();
-  }
-
   async start() {
     await mailer.init();
     await connection.connect();
     this.initServer();
     this.initMiddlewares();
     this.initRoutes();
+    this.initCron();
     const retListen = this.startListening();
     process.on('SIGILL', () => {
       connection.close();
@@ -53,6 +50,11 @@ module.exports = class Server {
     this.server.use(morgan('tiny'));
     this.server.use(express.json());
     this.server.use(cors({ origin: configEnv.allowedOrigin }));
+    this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  }
+
+  initCron() {
+    getIncrementBalance();
   }
 
   initRoutes() {
