@@ -53,7 +53,9 @@ module.exports = class Server {
   initMiddlewares() {
     this.server.use(morgan('tiny'));
     this.server.use(express.json());
-    this.server.use(cors({ origin: configEnv.allowedOrigin }));
+    this.server.use(
+      cors({ origin: [configEnv.allowedOrigin, configEnv.allowedOrigin1] }),
+    );
     this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
     this.server.use(passport.initialize());
     this.server.use(passport.session());

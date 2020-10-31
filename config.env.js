@@ -9,11 +9,9 @@ module.exports = {
   dbCollection: process.env.DB_COLLECTION,
   jwtPrivateKey: process.env.TOKEN_PRIVATE_KEY,
   srvUrl: `${process.env.SRV_URL}`,
-  imgUrl: `${process.env.SRV_URL}:${process.env.PORT}/images/`,
+  hostUrl: `${process.env.HOST_URL}`,
   allowedOrigin: `${process.env.HOST_URL}`,
-
-  nodeMailerUser: process.env.NODEMAILER_USER,
-  nodeMailerPass: process.env.NODEMAILER_PASS,
+  allowedOrigin1: `${process.env.HOST_URL1}`,
 
   paths: {
     tmp: path.join(process.cwd(), 'tmp'),
