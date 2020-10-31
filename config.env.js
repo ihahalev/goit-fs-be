@@ -34,4 +34,9 @@ module.exports = {
     host: `${process.env.SRV_URL}`,
     schemes: ['http'],
   },
+
+  google: {
+    clientId: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+  },
 };
