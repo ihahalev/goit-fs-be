@@ -6,19 +6,19 @@ class GoogleController {
     try {
       const { email } = profile._json;
       const displayName = email.substring(0, email.indexOf('@'));
-      const foundUser = await userModel.findOne({ email });
-      if (!foundUser) {
-        const newUser = await userModel.create({
-          name: displayName,
-          email,
-          verificationToken: null,
-        });
-        const token = await newUser.generateAndSaveToken();
-        callback(null, { token });
-      } else {
-        const token = await foundUser.generateAndSaveToken();
-        callback(null, { token });
-      }
+      const user = userModel.update(
+        email,
+        {
+          $setOnInsert: {
+            name: displayName,
+            email,
+            verificationToken: null,
+          },
+        },
+        { upsert: true },
+      );
+      const token = await user.generateAndSaveToken();
+      callback(null, { token });
     } catch (err) {
       callback(err, null);
     }
