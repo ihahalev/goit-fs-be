@@ -93,7 +93,7 @@ class TransactionController {
         amount: Joi.number().positive().integer().required(),
         type: Joi.string().valid(...transactionTypes),
         category: Joi.string().min(3),
-        comment: Joi.string(),
+        comment: Joi.string().allow(''),
       }).validate(req.body);
 
       if (validationError) {
