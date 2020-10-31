@@ -93,11 +93,11 @@ class TransactionController {
         amount: Joi.number().positive().integer().required(),
         type: Joi.string().valid(...transactionTypes),
         category: Joi.string().min(3),
-        comment: Joi.string().min(3),
+        comment: Joi.string(),
       }).validate(req.body);
 
       if (validationError) {
-        throw new ApiError(400, 'Bad requiest', validationError);
+        throw new ApiError(400, 'Bad request', validationError);
       }
 
       next();
@@ -114,7 +114,7 @@ class TransactionController {
       }).validate(req.query);
 
       if (validationError) {
-        throw new ApiError(400, 'Bad requiest', validationError);
+        throw new ApiError(400, 'Bad request', validationError);
       }
 
       next();
