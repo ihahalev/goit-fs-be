@@ -26,8 +26,8 @@ class TransactionController {
         type,
         category,
         comment,
-        familyId: req.family,
-        userId: req.user,
+        familyId: req.family._id,
+        userId: req.user._id,
         transactionDate: Date.now(),
       });
       return responseNormalizer(201, res, {
@@ -54,11 +54,11 @@ class TransactionController {
   async getAnnualStats(req, res) {
     try {
       const { familyId } = req.user;
-      const { month, year } = req.params;
+      const { month, year } = req.query;
       const transes = await transactionModel.getFamilyAnnualReport(
         familyId,
-        month,
-        year,
+        Number(month),
+        Number(year),
       );
       return responseNormalizer(200, res, { transes });
     } catch (e) {
@@ -74,13 +74,13 @@ class TransactionController {
           message: 'Not part of a Family',
         });
       }
-      const family = familyModel.findById(user.familyId);
+      const family = familyModel.findById(familyId);
       if (!family) {
         throw new ApiError(403, 'Forbidden', {
           message: 'Not part of a Family',
         });
       }
-      req.user = user;
+      req.family = family;
       next();
     } catch (e) {
       errorHandler(req, res, e);
@@ -106,12 +106,12 @@ class TransactionController {
     }
   }
 
-  validateAnnualStatsParams(req, res, next) {
+  validateAnnualStatsQuery(req, res, next) {
     try {
       const { error: validationError } = Joi.object({
         year: Joi.number().positive().integer().min(1970).required(),
         month: Joi.number().positive().integer().min(0).max(11).required(),
-      }).validate(req.params);
+      }).validate(req.query);
 
       if (validationError) {
         throw new ApiError(400, 'Bad requiest', validationError);
