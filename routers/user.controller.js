@@ -28,7 +28,7 @@ class UserController {
 
       await mailer.sendVerificationMail(email, verificationToken);
 
-      responseNormalizer(201, res, { id: _id, name, email });
+      responseNormalizer(201, res, { id: _id, username: name, email });
     } catch (err) {
       errorHandler(req, res, err);
     }
@@ -125,7 +125,12 @@ class UserController {
     try {
       const { _id, name, email, familyId } = req.user;
 
-      responseNormalizer(200, res, { id: _id, name, email, familyId });
+      responseNormalizer(200, res, {
+        id: _id,
+        username: name,
+        email,
+        familyId,
+      });
     } catch (err) {
       errorHandler(req, res, err);
     }
