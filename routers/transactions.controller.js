@@ -16,6 +16,7 @@ class TransactionController {
   async createTransaction(req, res) {
     try {
       const { amount, type, category, comment } = req.body;
+      const defCategory = category ? category : transactionCategories[0];
       const {
         _id,
         type: dbType,
@@ -24,7 +25,7 @@ class TransactionController {
       } = await transactionModel.create({
         amount,
         type,
-        category,
+        category: defCategory,
         comment,
         familyId: req.family._id,
         userId: req.user._id,
@@ -92,7 +93,10 @@ class TransactionController {
       const { error: validationError } = Joi.object({
         amount: Joi.number().positive().integer().required(),
         type: Joi.string().valid(...transactionTypes),
-        category: Joi.string().min(3),
+        category: Joi.alternatives().try(
+          Joi.string().valid(...transactionCategories),
+          Joi.string().empty('').default(transactionCategories[0]),
+        ),
         comment: Joi.string().allow(''),
       }).validate(req.body);
 

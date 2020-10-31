@@ -11,7 +11,7 @@ const {
   transactionsRouter,
 } = require('./routers');
 
-const getIncrementBalance = require('./cron/getIncrementBalance')
+const getIncrementBalance = require('./cron/getIncrementBalance');
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./docs/index');
@@ -49,7 +49,9 @@ module.exports = class Server {
   initMiddlewares() {
     this.server.use(morgan('tiny'));
     this.server.use(express.json());
-    this.server.use(cors({ origin: configEnv.allowedOrigin }));
+    this.server.use(
+      cors({ origin: [configEnv.allowedOrigin, configEnv.allowedOrigin1] }),
+    );
     this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   }
 

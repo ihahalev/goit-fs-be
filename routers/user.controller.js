@@ -1,10 +1,9 @@
 const Joi = require('joi');
 const uuid = require('uuid').v4;
 const { userModel } = require('../database/models');
-// const { db } = require('../database/models/user.model');
 const { ApiError, errorHandler, mailer } = require('../helpers');
 const responseNormalizer = require('../normalizers/response-normalizer');
-const config = require('../config.env');
+const configEnv = require('../config.env');
 
 class UserController {
   constructor() {}
@@ -78,7 +77,10 @@ class UserController {
 
       await foundUser.save();
 
-      responseNormalizer(200, res, 'User is successfully verified');
+      res
+        .status(200)
+        .redirect(`${configEnv.hostUrl}/`)
+        .send('User is successfully verified');
     } catch (err) {
       errorHandler(req, res, err);
     }
