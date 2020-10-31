@@ -28,7 +28,7 @@ class UserController {
 
       await mailer.sendVerificationMail(email, verificationToken);
 
-      responseNormalizer(201, res, { id: _id, name, email });
+      responseNormalizer(201, res, { id: _id, username: name, email });
     } catch (err) {
       errorHandler(req, res, err);
     }
