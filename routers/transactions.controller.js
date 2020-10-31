@@ -16,6 +16,7 @@ class TransactionController {
   async createTransaction(req, res) {
     try {
       const { amount, type, category, comment } = req.body;
+      const defCategory = category ? category : transactionCategories[0];
       const {
         _id,
         type: dbType,
@@ -24,10 +25,10 @@ class TransactionController {
       } = await transactionModel.create({
         amount,
         type,
-        category,
+        category: defCategory,
         comment,
-        familyId: req.family,
-        userId: req.user,
+        familyId: req.family._id,
+        userId: req.user._id,
         transactionDate: Date.now(),
       });
       return responseNormalizer(201, res, {
@@ -54,11 +55,11 @@ class TransactionController {
   async getAnnualStats(req, res) {
     try {
       const { familyId } = req.user;
-      const { month, year } = req.params;
+      const { month, year } = req.query;
       const transes = await transactionModel.getFamilyAnnualReport(
         familyId,
-        month,
-        year,
+        Number(month),
+        Number(year),
       );
       return responseNormalizer(200, res, { transes });
     } catch (e) {
@@ -74,13 +75,13 @@ class TransactionController {
           message: 'Not part of a Family',
         });
       }
-      const family = familyModel.findById(user.familyId);
+      const family = familyModel.findById(familyId);
       if (!family) {
         throw new ApiError(403, 'Forbidden', {
           message: 'Not part of a Family',
         });
       }
-      req.user = user;
+      req.family = family;
       next();
     } catch (e) {
       errorHandler(req, res, e);
@@ -92,12 +93,15 @@ class TransactionController {
       const { error: validationError } = Joi.object({
         amount: Joi.number().positive().integer().required(),
         type: Joi.string().valid(...transactionTypes),
-        category: Joi.string().min(3),
-        comment: Joi.string().min(3),
+        category: Joi.alternatives().try(
+          Joi.string().valid(...transactionCategories),
+          Joi.string().empty('').default(transactionCategories[0]),
+        ),
+        comment: Joi.string().allow(''),
       }).validate(req.body);
 
       if (validationError) {
-        throw new ApiError(400, 'Bad requiest', validationError);
+        throw new ApiError(400, 'Bad request', validationError);
       }
 
       next();
@@ -106,15 +110,15 @@ class TransactionController {
     }
   }
 
-  validateAnnualStatsParams(req, res, next) {
+  validateAnnualStatsQuery(req, res, next) {
     try {
       const { error: validationError } = Joi.object({
         year: Joi.number().positive().integer().min(1970).required(),
         month: Joi.number().positive().integer().min(0).max(11).required(),
-      }).validate(req.params);
+      }).validate(req.query);
 
       if (validationError) {
-        throw new ApiError(400, 'Bad requiest', validationError);
+        throw new ApiError(400, 'Bad request', validationError);
       }
 
       next();

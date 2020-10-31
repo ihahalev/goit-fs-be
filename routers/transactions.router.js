@@ -17,7 +17,7 @@ router.get(
   '/stats/annual',
   authCheck,
   transactionsController.familyAuthorization,
-  transactionsController.validateAnnualStatsParams,
+  transactionsController.validateAnnualStatsQuery,
   transactionsController.getAnnualStats,
 );
 

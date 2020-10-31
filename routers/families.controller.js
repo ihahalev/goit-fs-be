@@ -15,7 +15,7 @@ class FamilyController {
           409,
           'user already created family/is a part of family',
         );
-      };
+      }
 
       const createdFamily = await familyModel.create(req.body);
 
@@ -23,18 +23,20 @@ class FamilyController {
       req.user.save();
 
       const {
+        _id,
         balance,
         flatPrice,
         flatSquareMeters,
         totalSalary,
         passiveIncome,
         incomePercentageToSavings,
-        giftsUnpacked,
+        // giftsUnpacked,
         giftsForUnpacking,
       } = createdFamily;
 
       return responseNormalizer(201, res, {
         info: {
+          _id,
           balance,
           flatPrice,
           flatSquareMeters,
@@ -43,16 +45,15 @@ class FamilyController {
           incomePercentageToSavings,
         },
         gifts: {
-          giftsUnpacked,
+          // giftsUnpacked,
           giftsForUnpacking,
-        }
+        },
       });
-
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
-    };
-  };
+    }
+  }
 
   async getCurrentFamily(req, res) {
     try {
@@ -60,13 +61,14 @@ class FamilyController {
 
       const currentFamily = await familyModel.findById(familyId);
 
-      const { balance,
+      const {
+        balance,
         flatPrice,
         flatSquareMeters,
         totalSalary,
         passiveIncome,
         incomePercentageToSavings,
-        giftsUnpacked,
+        // giftsUnpacked,
         giftsForUnpacking,
       } = currentFamily;
 
@@ -80,17 +82,15 @@ class FamilyController {
           incomePercentageToSavings,
         },
         gifts: {
-          giftsUnpacked,
+          // giftsUnpacked,
           giftsForUnpacking,
-        }
+        },
       });
-
-
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
-    };
-  };
+    }
+  }
 
   async getStatsFlatFamily(req, res) {
     try {
@@ -99,23 +99,32 @@ class FamilyController {
       const familyCurrent = await familyModel.findById(familyId);
 
       if (!familyCurrent) {
-        throw new ApiError(
-          403,
-          'user not a member of family',
-        );
-      };
+        throw new ApiError(403, 'user not a member of family');
+      }
 
-      const { giftsForUnpacking, flatPrice, balance, flatSquareMeters, totalSalary, passiveIncome, incomePercentageToSavings } = familyCurrent;
+      const {
+        // giftsForUnpacking,
+        flatPrice,
+        balance,
+        flatSquareMeters,
+        totalSalary,
+        passiveIncome,
+        incomePercentageToSavings,
+      } = familyCurrent;
 
-      const savingsPercentage = Math.floor((balance * 100) / (flatPrice));
+      const savingsPercentage = Math.floor((balance * 100) / flatPrice);
       const savingsValue = balance;
       const costSquareMeter = Math.ceil(flatPrice / flatSquareMeters);
       const savingsInSquareMeters = Math.floor(balance / costSquareMeter);
       const totalSquareMeters = flatSquareMeters;
 
-      const monthsLeftToSaveForFlat = Math.ceil((flatPrice - balance) / ((totalSalary + passiveIncome) * incomePercentageToSavings / 100))
+      const monthsLeftToSaveForFlat = Math.ceil(
+        (flatPrice - balance) /
+          (((totalSalary + passiveIncome) * incomePercentageToSavings) / 100),
+      );
 
-      const savingsForNextSquareMeterLeft = costSquareMeter - balance % costSquareMeter;
+      const savingsForNextSquareMeterLeft =
+        costSquareMeter - (balance % costSquareMeter);
 
       return responseNormalizer(200, res, {
         savingsPercentage,
@@ -124,14 +133,13 @@ class FamilyController {
         totalSquareMeters,
         monthsLeftToSaveForFlat,
         savingsForNextSquareMeterLeft,
-        giftsForUnpacking,
+        // giftsForUnpacking,
       });
-
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
-    };
-  };
+    }
+  }
 
   async updateFamily(req, res) {
     try {
@@ -143,13 +151,14 @@ class FamilyController {
         { new: true },
       );
 
-      const { balance,
+      const {
+        balance,
         flatPrice,
         flatSquareMeters,
         totalSalary,
         passiveIncome,
         incomePercentageToSavings,
-        giftsUnpacked,
+        // giftsUnpacked,
         giftsForUnpacking,
       } = familyToUpdate;
 
@@ -163,16 +172,15 @@ class FamilyController {
           incomePercentageToSavings,
         },
         gifts: {
-          giftsUnpacked,
+          // giftsUnpacked,
           giftsForUnpacking,
         },
       });
-
     } catch (err) {
       logger.error(err);
       errorHandler(req, res, err);
-    };
-  };
+    }
+  }
 
   validateCreatedFamilyObject(req, res, next) {
     try {
@@ -187,13 +195,13 @@ class FamilyController {
 
       if (validationError) {
         throw new ApiError(400, 'Bad request', validationError);
-      };
+      }
 
       next();
     } catch (e) {
       errorHandler(req, res, e);
-    };
-  };
+    }
+  }
 
   validateUpdateFamilyObject(req, res, next) {
     try {
@@ -212,8 +220,8 @@ class FamilyController {
       next();
     } catch (e) {
       errorHandler(req, res, e);
-    };
-  };
-};
+    }
+  }
+}
 
 module.exports = new FamilyController();
