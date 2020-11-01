@@ -32,20 +32,20 @@ transactionSchema.static('getFamilyAnnualReport', async function (
   startYear,
 ) {
   const startMonth = String(month + 1).padStart(2, '0');
-  const endMonth = String(month).padStart(2, '0');
+  const endMonth = String(month + 1).padStart(2, '0');
   const startDate = `${startYear}-${startMonth}-01`;
   const endDate = `${startYear - 1}-${endMonth}-01`;
   return this.aggregate([
-    // {
-    //   $match: {
-    //     familyId: `${familyId}`,
-    //   },
-    // },
+    {
+      $match: {
+        familyId,
+      },
+    },
     {
       $match: {
         transactionDate: {
-          $gte: new Date(`${endDate}`),
-          $lt: new Date(`${startDate}`),
+          $gte: new Date(endDate),
+          $lt: new Date(startDate),
         },
       },
     },
@@ -59,7 +59,7 @@ transactionSchema.static('getFamilyAnnualReport', async function (
           $cond: [{ $eq: ['$type', 'EXPENSE'] }, '$amount', 0],
         },
         percentAmount: {
-          $cond: [{ $eq: ['$type', 'PERCENT'] }, '$amount', 0],
+          $cond: [{ $eq: ['$type', 'PERCENT'] }, '$amount', null],
         },
       },
     },
@@ -73,7 +73,8 @@ transactionSchema.static('getFamilyAnnualReport', async function (
         },
         incomeAmount: { $sum: '$incomeAmount' },
         expenses: { $sum: '$expenses' },
-        percentAmount: { $sum: '$percentAmount' },
+        percentAmount: { $avg: '$percentAmount' },
+        // comment: { $addToSet: '$comment' },
       },
     },
     {
@@ -107,44 +108,45 @@ transactionSchema.static('monthlyAccrual', async function (
   percent,
   userId,
   familyId,
+  isNew = false,
 ) {
-  const date = new Date();
-  const month = String(date.getMonth()).padStart(2, '0');
-  const startDate = `${date.getFullYear()}-${month}-01`;
-  const [{ totalSavings }] = await this.aggregate([
-    {
-      $match: {
-        familyId: `${familyId}`,
-      },
-    },
-    {
-      $match: {
-        transactionDate: {
-          $lt: new Date(`${startDate}`),
+  if (!isNew) {
+    const date = new Date();
+    const month = String(date.getMonth()).padStart(2, '0');
+    const startDate = `${date.getFullYear()}-${month}-01`;
+    const groupRes = await this.aggregate([
+      {
+        $match: {
+          familyId: familyId,
         },
       },
-    },
-    {
-      $addFields: {
-        transactionDate: '$transactionDate',
-        incomeAmount: {
-          $cond: [{ $eq: ['$type', 'INCOME'] }, '$amount', 0],
-        },
-        expenses: {
-          $cond: [{ $eq: ['$type', 'EXPENSE'] }, '$amount', 0],
+      {
+        $match: {
+          transactionDate: { $lt: new Date(startDate) },
         },
       },
-    },
-    {
-      $group: {
-        _id: null,
-        incomeAmount: { $sum: '$incomeAmount' },
-        expenses: { $sum: '$expenses' },
-        totalSavings: { $sum: { $subtract: ['$incomeAmount', '$expenses'] } },
+      {
+        $addFields: {
+          transactionDate: '$transactionDate',
+          amount: { $ifNull: ['$amount', 0] },
+          incomeAmount: {
+            $cond: [{ $eq: ['$type', 'INCOME'] }, '$amount', 0],
+          },
+          expenses: {
+            $cond: [{ $eq: ['$type', 'EXPENSE'] }, '$amount', 0],
+          },
+        },
       },
-    },
-  ]);
-
+      {
+        $group: {
+          _id: null,
+          incomeAmount: { $sum: '$incomeAmount' },
+          expenses: { $sum: '$expenses' },
+          totalSavings: { $sum: { $subtract: ['$incomeAmount', '$expenses'] } },
+        },
+      },
+    ]);
+  }
   await this.create({
     amount: income,
     type: 'INCOME',
@@ -164,7 +166,15 @@ transactionSchema.static('monthlyAccrual', async function (
     transactionDate: Date.now(),
   });
 
-  return totalSavings;
+  if (groupRes.length) {
+    const [{ totalSavings }] = groupRes;
+    if (!Number.isInteger(totalSavings)) {
+      return 0;
+    }
+    return totalSavings;
+  } else {
+    return 0;
+  }
 });
 
 module.exports = mongoose.model('Transaction', transactionSchema);
