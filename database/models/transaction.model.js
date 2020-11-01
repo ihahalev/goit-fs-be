@@ -110,11 +110,12 @@ transactionSchema.static('monthlyAccrual', async function (
   familyId,
   isNew = false,
 ) {
+  let groupRes = [];
   if (!isNew) {
     const date = new Date();
     const month = String(date.getMonth()).padStart(2, '0');
     const startDate = `${date.getFullYear()}-${month}-01`;
-    const groupRes = await this.aggregate([
+    groupRes = await this.aggregate([
       {
         $match: {
           familyId: familyId,

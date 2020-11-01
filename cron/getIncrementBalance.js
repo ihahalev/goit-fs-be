@@ -15,15 +15,15 @@ async function main() {
 
       await Promise.all(
         allFamilies.map(async (item) => {
-          // item.balance += item.totalSalary + item.passiveIncome;
+
           item.giftsForUnpacking = Math.floor(
             (item.balance * item.flatSquareMeters) / item.flatPrice -
-              item.giftsUnpacked,
+            item.giftsUnpacked,
           );
-          // await item.save();
+
           const sum = item.totalSalary + item.passiveIncome;
           const user = await userModel.findOne({ familyId: item._id });
-          // awaiting transactionModal realization
+
           if (user) {
             item.balance = await transactionModel.monthlyAccrual(
               sum,
