@@ -5,18 +5,18 @@ class GoogleController {
   async findOrCreate(profile, callback) {
     try {
       const { email } = profile._json;
+      console.log(email);
       const displayName = email.substring(0, email.indexOf('@'));
-      const user = userModel.update(
-        email,
+      const user = await userModel.findOneAndUpdate(
+        { email },
         {
           $setOnInsert: {
             name: displayName,
-            email,
-            verificationToken: null,
           },
         },
-        { upsert: true },
+        { upsert: true, new: true },
       );
+      console.log(user);
       const token = await user.generateAndSaveToken();
       callback(null, { token });
     } catch (err) {
