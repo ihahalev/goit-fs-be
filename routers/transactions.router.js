@@ -21,4 +21,11 @@ router.get(
   transactionsController.getAnnualStats,
 );
 
+router.get(
+  '/month/current',
+  authCheck,
+  transactionsController.familyAuthorization,
+  transactionsController.getCurrentMonth,
+);
+
 module.exports = router;

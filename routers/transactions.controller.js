@@ -15,6 +15,7 @@ class TransactionController {
 
   async createTransaction(req, res) {
     try {
+      const { _id: userId, familyId } = req.user;
       const { amount, type, category, comment } = req.body;
       const defCategory = category ? category : transactionCategories[0];
       const {
@@ -27,10 +28,13 @@ class TransactionController {
         type,
         category: defCategory,
         comment,
-        familyId: req.family._id,
-        userId: req.user._id,
+        familyId,
+        userId: userId,
         transactionDate: Date.now(),
       });
+      const monthBalance = await transactionModel.getFamilyMonthBalance(
+        familyId,
+      );
       return responseNormalizer(201, res, {
         _id,
         amount,
@@ -38,6 +42,7 @@ class TransactionController {
         category: dbCategory,
         comment,
         transactionDate,
+        monthBalance,
       });
     } catch (e) {
       errorHandler(req, res, e);
@@ -62,6 +67,18 @@ class TransactionController {
         Number(year),
       );
       return responseNormalizer(200, res, { transes });
+    } catch (e) {
+      errorHandler(req, res, e);
+    }
+  }
+
+  async getCurrentMonth(req, res) {
+    try {
+      const { familyId } = req.user;
+      const monthBalance = await transactionModel.getFamilyMonthBalance(
+        familyId,
+      );
+      return responseNormalizer(200, res, { monthBalance });
     } catch (e) {
       errorHandler(req, res, e);
     }
