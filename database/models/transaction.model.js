@@ -178,4 +178,52 @@ transactionSchema.static('monthlyAccrual', async function (
   }
 });
 
+transactionSchema.static('getFamilyMonthBalance', async function (familyId) {
+  const date = new Date();
+  const month = String(date.getMonth()).padStart(2, '0');
+  const startDate = `${date.getFullYear()}-${month}-01`;
+  const groupRes = await this.aggregate([
+    {
+      $match: {
+        familyId: familyId,
+      },
+    },
+    {
+      $match: {
+        transactionDate: { $gte: new Date(startDate) },
+      },
+    },
+    {
+      $addFields: {
+        transactionDate: '$transactionDate',
+        amount: { $ifNull: ['$amount', 0] },
+        incomeAmount: {
+          $cond: [{ $eq: ['$type', 'INCOME'] }, '$amount', 0],
+        },
+        expenses: {
+          $cond: [{ $eq: ['$type', 'EXPENSE'] }, '$amount', 0],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        incomeAmount: { $sum: '$incomeAmount' },
+        expenses: { $sum: '$expenses' },
+        monthBalance: { $sum: { $subtract: ['$incomeAmount', '$expenses'] } },
+      },
+    },
+  ]);
+  console.log(groupRes);
+  if (groupRes.length) {
+    const [{ monthBalance }] = groupRes;
+    if (!Number.isInteger(monthBalance)) {
+      return 0;
+    }
+    return monthBalance;
+  } else {
+    return 0;
+  }
+});
+
 module.exports = mongoose.model('Transaction', transactionSchema);
