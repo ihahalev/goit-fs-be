@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { familyModel } = require('../database/models');
+const { familyModel, transactionModel } = require('../database/models');
 const { ApiError, errorHandler, getLogger } = require('../helpers');
 const responseNormalizer = require('../normalizers/response-normalizer');
 
@@ -8,7 +8,7 @@ const logger = getLogger('FamiliesController');
 class FamilyController {
   async createFamily(req, res) {
     try {
-      const { familyId } = req.user;
+      const { _id: userId, familyId } = req.user;
 
       if (familyId) {
         throw new ApiError(
@@ -30,9 +30,18 @@ class FamilyController {
         totalSalary,
         passiveIncome,
         incomePercentageToSavings,
-        // giftsUnpacked,
         giftsForUnpacking,
       } = createdFamily;
+
+      const sum = totalSalary + passiveIncome + balance;
+
+      await transactionModel.monthlyAccrual(
+        sum,
+        incomePercentageToSavings,
+        userId,
+        _id,
+        true
+      );
 
       return responseNormalizer(201, res, {
         info: {
@@ -45,7 +54,6 @@ class FamilyController {
           incomePercentageToSavings,
         },
         gifts: {
-          // giftsUnpacked,
           giftsForUnpacking,
         },
       });
@@ -68,7 +76,6 @@ class FamilyController {
         totalSalary,
         passiveIncome,
         incomePercentageToSavings,
-        // giftsUnpacked,
         giftsForUnpacking,
       } = currentFamily;
 
@@ -82,7 +89,6 @@ class FamilyController {
           incomePercentageToSavings,
         },
         gifts: {
-          // giftsUnpacked,
           giftsForUnpacking,
         },
       });
@@ -103,7 +109,6 @@ class FamilyController {
       }
 
       const {
-        // giftsForUnpacking,
         flatPrice,
         balance,
         flatSquareMeters,
@@ -120,7 +125,7 @@ class FamilyController {
 
       const monthsLeftToSaveForFlat = Math.ceil(
         (flatPrice - balance) /
-          (((totalSalary + passiveIncome) * incomePercentageToSavings) / 100),
+        (((totalSalary + passiveIncome) * incomePercentageToSavings) / 100),
       );
 
       const savingsForNextSquareMeterLeft =
@@ -133,7 +138,6 @@ class FamilyController {
         totalSquareMeters,
         monthsLeftToSaveForFlat,
         savingsForNextSquareMeterLeft,
-        // giftsForUnpacking,
       });
     } catch (err) {
       logger.error(err);
@@ -158,7 +162,6 @@ class FamilyController {
         totalSalary,
         passiveIncome,
         incomePercentageToSavings,
-        // giftsUnpacked,
         giftsForUnpacking,
       } = familyToUpdate;
 
@@ -172,7 +175,6 @@ class FamilyController {
           incomePercentageToSavings,
         },
         gifts: {
-          // giftsUnpacked,
           giftsForUnpacking,
         },
       });
@@ -222,6 +224,10 @@ class FamilyController {
       errorHandler(req, res, e);
     }
   }
+
+
+
+
 }
 
 module.exports = new FamilyController();
