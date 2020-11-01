@@ -10,7 +10,7 @@ const logger = getLogger('getIncrementBalance');
 
 async function main() {
   try {
-    await cron.schedule('0 2 2 * *', async function () {
+    await cron.schedule('15 0 1 * *', async function () {
       const allFamilies = await familyModel.find({});
 
       await Promise.all(
