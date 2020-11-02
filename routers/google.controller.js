@@ -1,4 +1,5 @@
 const { userModel } = require('../database/models');
+const configEnv = require('../config.env');
 
 class GoogleController {
   constructor() {}
@@ -25,7 +26,7 @@ class GoogleController {
   }
 
   redirectGoogle(req, res) {
-    res.redirect(`/?token=${req.user.token}`);
+    res.redirect(`${configEnv.hostUrl}/?token=${req.user.token}`);
   }
 }
 module.exports = new GoogleController();
