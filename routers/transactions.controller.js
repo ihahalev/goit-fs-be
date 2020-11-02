@@ -131,7 +131,7 @@ class TransactionController {
     try {
       const { error: validationError } = Joi.object({
         year: Joi.number().positive().integer().min(1970).required(),
-        month: Joi.number().positive().integer().min(0).max(11).required(),
+        month: Joi.number().positive().integer().min(1).max(12).required(),
       }).validate(req.query);
 
       if (validationError) {
