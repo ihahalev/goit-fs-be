@@ -29,12 +29,20 @@ const transactionSchema = new mongoose.Schema(
 transactionSchema.static('getFamilyAnnualReport', async function (
   familyId,
   month,
-  startYear,
+  year,
 ) {
-  const startMonth = String(month + 1).padStart(2, '0');
-  const endMonth = String(month + 1).padStart(2, '0');
-  const startDate = `${startYear}-${startMonth}-01`;
-  const endDate = `${startYear - 1}-${endMonth}-01`;
+  let calcMonth;
+  let startDate;
+  let endDate;
+  if (month >= 12) {
+    calcMonth = '01';
+    startDate = `${year + 1}-${calcMonth}-01`;
+    endDate = `${year}-${calcMonth}-01`;
+  } else {
+    calcMonth = String(month + 1).padStart(2, '0');
+    startDate = `${year}-${calcMonth}-01`;
+    endDate = `${year - 1}-${calcMonth}-01`;
+  }
   return this.aggregate([
     {
       $match: {
