@@ -206,7 +206,7 @@ transactionSchema.static('monthlyAccrual', async function (
 });
 
 transactionSchema.static('getFamilyMonthBalance', async function (familyId) {
-  const date = new Date(Date.now());
+  const date = new Date();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const startDate = `${date.getFullYear()}-${month}-01`;
   const groupRes = await this.aggregate([
