@@ -77,10 +77,7 @@ class UserController {
 
       await foundUser.save();
 
-      res
-        .status(200)
-        .redirect(`${configEnv.hostUrl}/`)
-        .send('User is successfully verified');
+      res.status(200).redirect(`${configEnv.hostUrl}/`);
     } catch (err) {
       errorHandler(req, res, err);
     }

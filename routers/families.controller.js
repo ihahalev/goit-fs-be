@@ -33,14 +33,14 @@ class FamilyController {
         giftsForUnpacking,
       } = createdFamily;
 
-      const sum = totalSalary + passiveIncome + balance;
+      const sum = totalSalary + passiveIncome;
 
       await transactionModel.monthlyAccrual(
         sum,
         incomePercentageToSavings,
         userId,
         _id,
-        true
+        balance,
       );
 
       return responseNormalizer(201, res, {
@@ -125,7 +125,7 @@ class FamilyController {
 
       const monthsLeftToSaveForFlat = Math.ceil(
         (flatPrice - balance) /
-        (((totalSalary + passiveIncome) * incomePercentageToSavings) / 100),
+          (((totalSalary + passiveIncome) * incomePercentageToSavings) / 100),
       );
 
       const savingsForNextSquareMeterLeft =
@@ -224,10 +224,6 @@ class FamilyController {
       errorHandler(req, res, e);
     }
   }
-
-
-
-
 }
 
 module.exports = new FamilyController();
