@@ -28,6 +28,16 @@ module.exports = class Server {
     this.server = null;
   }
 
+  async startTest() {
+    await mailer.init();
+    await connection.connect();
+    this.initServer();
+    this.initMiddlewares();
+    this.initRoutes();
+    this.initCron();
+    return this.server;
+  }
+
   async start() {
     await mailer.init();
     await connection.connect();
