@@ -116,10 +116,10 @@ transactionSchema.static('monthlyAccrual', async function (
   percent,
   userId,
   familyId,
-  isNew = false,
+  savings = 0,
 ) {
   let groupRes = [];
-  if (!isNew) {
+  if (!savings || savings <= 0) {
     const date = new Date();
     const month = String(date.getMonth()).padStart(2, '0');
     const startDate = `${date.getFullYear()}-${month}-01`;
@@ -139,7 +139,16 @@ transactionSchema.static('monthlyAccrual', async function (
           transactionDate: '$transactionDate',
           amount: { $ifNull: ['$amount', 0] },
           incomeAmount: {
-            $cond: [{ $eq: ['$type', 'INCOME'] }, '$amount', 0],
+            $cond: [
+              {
+                $or: [
+                  { $eq: ['$type', 'INCOME'] },
+                  { $eq: ['$type', 'SAVINGS'] },
+                ],
+              },
+              '$amount',
+              0,
+            ],
           },
           expenses: {
             $cond: [{ $eq: ['$type', 'EXPENSE'] }, '$amount', 0],
@@ -155,6 +164,16 @@ transactionSchema.static('monthlyAccrual', async function (
         },
       },
     ]);
+  } else {
+    await this.create({
+      amount: savings,
+      type: 'SAVINGS',
+      category: 'Сбережения',
+      comment: 'Начальные сбережения',
+      familyId,
+      userId,
+      transactionDate: Date.now(),
+    });
   }
   await this.create({
     amount: income,

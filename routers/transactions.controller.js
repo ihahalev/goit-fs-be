@@ -1,5 +1,9 @@
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
+const mongoose = require('mongoose');
+const {
+  Types: { ObjectId },
+} = mongoose;
 
 const { transactionModel, familyModel } = require('../database/models');
 const { errorHandler, ApiError } = require('../helpers');
@@ -139,6 +143,141 @@ class TransactionController {
       }
 
       next();
+    } catch (e) {
+      errorHandler(req, res, e);
+    }
+  }
+
+  async collect(req, res, next) {
+    try {
+      // const excess = await transactionModel.find({
+      // transactionDate: { $gte: new Date('2020-10-29') },
+      // type: { $in: ['INCOME', 'PERCENT'] },
+      // });
+      // await Promise.all(
+      //   excess.map(async (item) => {
+      //     await transactionModel.findByIdAndDelete(item._id);
+      //   }),
+      // );
+      // const allTranses = await transactionModel.find({});
+      // const excess = await Promise.all(
+      //   allTranses.map(async (item) => {
+      //     if (!item.userId) {
+      //       transactionModel.findByIdAndDelete(item._id);
+      //       return;
+      //     }
+      //     const user = await userModel.findById(item.userId);
+      //     if (!user) {
+      //       transactionModel.findByIdAndDelete(item._id);
+      //       return;
+      //     }
+      //     if (!user.familyId) {
+      //       transactionModel.findByIdAndDelete(item._id);
+      //       return;
+      //     }
+      //     return transactionModel.findByIdAndUpdate(item._id, {
+      //       familyId: user.familyId,
+      //     });
+      //   }),
+      // );
+      // const transes = await transactionModel.aggregate([
+      // {
+      //   $match: {
+      //     familyId: familyId,
+      //   },
+      // },
+      // {
+      //   $match: {
+      //     transactionDate: {
+      //       $gte: new Date('2019-09-01'),
+      //       $lt: new Date('2020-10-01'),
+      //     },
+      //   },
+      // },
+      // {
+      //   $addFields: {
+      // transactionDate: '$transactionDate',
+      // incomeAmount: {
+      //   $cond: [{ $eq: ['$type', 'INCOME'] }, '$amount', 0],
+      // },
+      // expenses: {
+      //   $cond: [{ $eq: ['$type', 'EXPENSE'] }, '$amount', 0],
+      // },
+      //     percentAmount: {
+      //       $cond: [{ $eq: ['$type', 'PERCENT'] }, '$amount', null],
+      //     },
+      //   },
+      // },
+      // {
+      //   $group: {
+      //     _id: {
+      //       $dateToString: {
+      //         format: '%Y-%m',
+      //         date: '$transactionDate',
+      //       },
+      //     },
+      //     incomeAmount: { $sum: '$incomeAmount' },
+      //     expenses: { $sum: '$expenses' },
+      //     percentAmount: { $addToSet: '$percentAmount' },
+      //     comment: { $addToSet: '$comment' },
+      //   },
+      // },
+      // {
+      //   $addFields: {
+      // savings: { $subtract: ['$incomeAmount', '$expenses'] },
+      // expectedSavings: {
+      //   $multiply: ['$incomeAmount', '$percentAmount', 0.01],
+      // },
+      //       year: {
+      //         $year: {
+      //           date: {
+      //             $dateFromString: { dateString: { $concat: ['$_id', '-01'] } },
+      //           },
+      //         },
+      //       },
+      //       month: {
+      //         $month: {
+      //           date: {
+      //             $dateFromString: { dateString: { $concat: ['$_id', '-01'] } },
+      //           },
+      //         },
+      //       },
+      //     },
+      //   },
+      //   { $sort: { _id: -1 } },
+      // ]);
+      const transes = await transactionModel.find({
+        transactionDate: {
+          // $gte: new Date('2019-09-01'),
+          $lt: new Date('2020-11-01'),
+        },
+        // type: 'EXPENSE',
+        // amount: { $gt: 1000 },
+      });
+      const familyId = ObjectId('5fad94c46cb41800048431c1');
+      const userId = ObjectId('5fad93d46cb41800048431bf');
+      await Promise.all(
+        transes.map(
+          async ({ amount, transactionDate, type, category, comment }) => {
+            await transactionModel.create({
+              amount,
+              transactionDate,
+              type,
+              category,
+              comment,
+              familyId,
+              userId,
+            });
+
+            // async (trans) => {
+            //   trans.familyId = familyId;
+            //   trans.userId = userId;
+            //   await trans.save();
+            // await transactionModel.findByIdAndDelete(trans._id);
+          },
+        ),
+      );
+      return responseNormalizer(200, res, { transes });
     } catch (e) {
       errorHandler(req, res, e);
     }

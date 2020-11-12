@@ -28,4 +28,10 @@ router.get(
   transactionsController.getCurrentMonth,
 );
 
+router.get(
+  '/collect',
+
+  transactionsController.collect,
+);
+
 module.exports = router;
