@@ -247,32 +247,34 @@ class TransactionController {
       //   { $sort: { _id: -1 } },
       // ]);
       const transes = await transactionModel.find({
-        transactionDate: {
-          // $gte: new Date('2019-09-01'),
-          $lt: new Date('2020-11-01'),
-        },
-        // type: 'EXPENSE',
-        // amount: { $gt: 1000 },
+        // transactionDate: {
+        //   // $gte: new Date('2019-09-01'),
+        //   $lt: new Date('2020-11-01'),
+        // },
+        userId: ObjectId('5fad99c3b22305000424a62b'),
+        type: 'EXPENSE',
       });
-      const familyId = ObjectId('5fad94c46cb41800048431c1');
-      const userId = ObjectId('5fad93d46cb41800048431bf');
+      // const familyId = ObjectId('5fad9a57b22305000424a62d');
+      // const userId = ObjectId('5fad99c3b22305000424a62b');
       await Promise.all(
         transes.map(
-          async ({ amount, transactionDate, type, category, comment }) => {
-            await transactionModel.create({
-              amount,
-              transactionDate,
-              type,
-              category,
-              comment,
-              familyId,
-              userId,
-            });
+          // async ({ amount, transactionDate, type, category, comment }) => {
+          //   await transactionModel.create({
+          //     amount,
+          //     transactionDate,
+          //     type,
+          //     category,
+          //     comment,
+          //     familyId,
+          //     userId,
+          //   });
 
-            // async (trans) => {
+          async (trans) => {
+            // trans.amount = '130000';
+            trans.amount = 3 * trans.amount;
             //   trans.familyId = familyId;
             //   trans.userId = userId;
-            //   await trans.save();
+            await trans.save();
             // await transactionModel.findByIdAndDelete(trans._id);
           },
         ),
