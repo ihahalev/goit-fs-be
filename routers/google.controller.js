@@ -26,7 +26,14 @@ class GoogleController {
   }
 
   redirectGoogle(req, res) {
-    res.redirect(`${configEnv.hostUrl}/?token=${req.user.token}`);
+    const refer = req.headers.referer;
+    const host = configEnv.hostUrl;
+    const hostLocal = configEnv.hostUrl1;
+    if (refer === host) {
+      res.redirect(`${host}/?token=${req.user.token}`);
+    } else if (refer === hostLocal) {
+      res.redirect(`${hostLocal}/?token=${req.user.token}`);
+    }
   }
 }
 module.exports = new GoogleController();
