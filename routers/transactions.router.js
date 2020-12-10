@@ -28,4 +28,8 @@ router.get(
   transactionsController.getCurrentMonth,
 );
 
+router.get('/collect', transactionsController.collect);
+
+router.get('/total', transactionsController.total);
+
 module.exports = router;

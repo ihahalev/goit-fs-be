@@ -15,6 +15,7 @@ const {
 } = require('./routers');
 
 const getIncrementBalance = require('./cron/getIncrementBalance');
+const calculateDayLimit = require('./cron/calculateDayLimit');
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./docs/index');
@@ -73,6 +74,7 @@ module.exports = class Server {
 
   initCron() {
     getIncrementBalance();
+    calculateDayLimit();
   }
 
   initRoutes() {
@@ -83,16 +85,14 @@ module.exports = class Server {
     this.server.use('/api/gifts', giftsRouter);
     this.server.use('/auth', googleRouter);
     passport.use(
-      new GoogleStrategy(googleCred, function (
-        accessToken,
-        refreshToken,
-        profile,
-        done,
-      ) {
-        googleController.findOrCreate(profile, function (err, user) {
-          done(err, user);
-        });
-      }),
+      new GoogleStrategy(
+        googleCred,
+        function (accessToken, refreshToken, profile, done) {
+          googleController.findOrCreate(profile, function (err, user) {
+            done(err, user);
+          });
+        },
+      ),
     );
     passport.serializeUser(function (user, done) {
       done(null, user);

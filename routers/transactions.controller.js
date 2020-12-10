@@ -39,6 +39,13 @@ class TransactionController {
       const monthBalance = await transactionModel.getFamilyMonthBalance(
         familyId,
       );
+      const family = await familyModel.findById(familyId);
+      if (_id) {
+        family.dayLimit -= amount;
+        const incomeSavings = family.getDesiredSavings();
+        family.monthLimit = monthBalance - incomeSavings;
+        await family.save();
+      }
       return responseNormalizer(201, res, {
         _id,
         amount,
@@ -47,6 +54,8 @@ class TransactionController {
         comment,
         transactionDate,
         monthBalance,
+        dayLimit: family.dayLimit.toFixed(2),
+        monthLimit: family.monthLimit.toFixed(2),
       });
     } catch (e) {
       errorHandler(req, res, e);
@@ -82,7 +91,12 @@ class TransactionController {
       const monthBalance = await transactionModel.getFamilyMonthBalance(
         familyId,
       );
-      return responseNormalizer(200, res, { monthBalance });
+      const { dayLimit, monthLimit } = req.family;
+      return responseNormalizer(200, res, {
+        monthBalance,
+        dayLimit: dayLimit.toFixed(2),
+        monthLimit: monthLimit.toFixed(2),
+      });
     } catch (e) {
       errorHandler(req, res, e);
     }
@@ -96,7 +110,7 @@ class TransactionController {
           message: 'Not part of a Family',
         });
       }
-      const family = familyModel.findById(familyId);
+      const family = await familyModel.findById(familyId);
       if (!family) {
         throw new ApiError(403, 'Forbidden', {
           message: 'Not part of a Family',
@@ -143,6 +157,100 @@ class TransactionController {
       }
 
       next();
+    } catch (e) {
+      errorHandler(req, res, e);
+    }
+  }
+
+  async collect(req, res, next) {
+    try {
+      const transes = await transactionModel.find({
+        // transactionDate: {
+        //   $gte: new Date('2019-09-01'),
+        //   $lt: new Date('2019-10-01'),
+        // },
+        familyId: ObjectId('5fad8a031830a3386c356e61'),
+        // type: 'EXPENSE',
+      });
+      const familyId = ObjectId('5fd0e0ecd6bb64000482b56e');
+      const userId = ObjectId('5fcf8eb9fca83f0004a46926');
+      await Promise.all(
+        transes.map(
+          async ({ amount, transactionDate, type, category, comment }) => {
+            await transactionModel.create({
+              amount,
+              transactionDate,
+              type,
+              category,
+              comment,
+              familyId,
+              userId,
+            });
+          },
+        ),
+      );
+      return responseNormalizer(200, res, { transes });
+    } catch (e) {
+      errorHandler(req, res, e);
+    }
+  }
+
+  async total(req, res, next) {
+    try {
+      const familyId = ObjectId('5fd0e0ecd6bb64000482b56e');
+      const transes = await transactionModel.aggregate([
+        {
+          $match: {
+            familyId: familyId,
+          },
+        },
+        // {
+        //   $match: {
+        //     transactionDate: {
+        //       $gte: new Date('2019-09-01'),
+        //       $lt: new Date('2020-10-01'),
+        //     },
+        //   },
+        // },
+        {
+          $addFields: {
+            transactionDate: '$transactionDate',
+            incomeAmount: {
+              $cond: [{ $eq: ['$type', 'INCOME'] }, '$amount', 0],
+            },
+            expenses: {
+              $cond: [{ $eq: ['$type', 'EXPENSE'] }, '$amount', 0],
+            },
+            percentAmount: {
+              $cond: [{ $eq: ['$type', 'PERCENT'] }, '$amount', null],
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            // {
+            //   $dateToString: {
+            //     format: '%Y-%m',
+            //     date: '$transactionDate',
+            //   },
+            // },
+            incomeAmount: { $sum: '$incomeAmount' },
+            expenses: { $sum: '$expenses' },
+            percentAmount: { $avg: '$percentAmount' },
+          },
+        },
+        {
+          $addFields: {
+            savings: { $subtract: ['$incomeAmount', '$expenses'] },
+            expectedSavings: {
+              $multiply: ['$incomeAmount', '$percentAmount', 0.01],
+            },
+          },
+        },
+        { $sort: { _id: -1 } },
+      ]);
+      return responseNormalizer(200, res, { transes });
     } catch (e) {
       errorHandler(req, res, e);
     }
