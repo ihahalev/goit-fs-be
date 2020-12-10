@@ -165,6 +165,12 @@ class FamilyController {
         giftsForUnpacking,
       } = familyToUpdate;
 
+      transactionModel.updateIncomeAndPercent(
+        familyId,
+        totalSalary + passiveIncome,
+        incomePercentageToSavings,
+      );
+
       return responseNormalizer(200, res, {
         info: {
           balance,
