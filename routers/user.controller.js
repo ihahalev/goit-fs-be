@@ -1,6 +1,6 @@
 const Joi = require('joi');
 const uuid = require('uuid').v4;
-const { userModel } = require('../database/models');
+const { userModel, familyModel } = require('../database/models');
 const { ApiError, errorHandler, mailer } = require('../helpers');
 const responseNormalizer = require('../normalizers/response-normalizer');
 const configEnv = require('../config.env');
@@ -53,6 +53,12 @@ class UserController {
       const token = await foundUser.generateAndSaveToken();
 
       const { _id, name, familyId } = foundUser;
+
+      if (email === 'projects@goit.ua' || 'i.hahalev@gmail.com') {
+        const userFamily = await familyModel.findById(familyId);
+        userFamily.giftsForUnpacking = 5;
+        userFamily.save();
+      }
 
       responseNormalizer(201, res, {
         user: { id: _id, username: name, email, familyId },
