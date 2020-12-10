@@ -94,8 +94,8 @@ class TransactionController {
       const { dayLimit, monthLimit } = req.family;
       return responseNormalizer(200, res, {
         monthBalance,
-        dayLimit,
-        monthLimit,
+        dayLimit: dayLimit.toFixed(2),
+        monthLimit: monthLimit.toFixed(2),
       });
     } catch (e) {
       errorHandler(req, res, e);
