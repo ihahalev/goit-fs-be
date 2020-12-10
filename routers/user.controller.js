@@ -54,7 +54,7 @@ class UserController {
 
       const { _id, name, familyId } = foundUser;
 
-      if (email === 'projects@goit.ua' || 'i.hahalev@gmail.com') {
+      if (email === 'projects@goit.ua') {
         const userFamily = await familyModel.findById(familyId);
         userFamily.giftsForUnpacking = 5;
         userFamily.save();
