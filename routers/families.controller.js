@@ -1,6 +1,11 @@
 const Joi = require('joi');
 const { familyModel, transactionModel } = require('../database/models');
-const { ApiError, errorHandler, getLogger } = require('../helpers');
+const {
+  ApiError,
+  errorHandler,
+  getLogger,
+  daysToMonthEnd,
+} = require('../helpers');
 const responseNormalizer = require('../normalizers/response-normalizer');
 
 const logger = getLogger('FamiliesController');
@@ -16,8 +21,15 @@ class FamilyController {
           'user already created family/is a part of family',
         );
       }
-
-      const createdFamily = await familyModel.create(req.body);
+      const sum = this.totalSalary + this.passiveIncome;
+      const available = (sum * (100 - this.incomePercentageToSavings)) / 100;
+      const dailySum = available / daysToMonthEnd();
+      console.log('createFamily', dailySum, available);
+      const createdFamily = await familyModel.create({
+        ...req.body,
+        dayLimit: dailySum.toFixed(2),
+        monthLimit: available.toFixed(2),
+      });
 
       req.user.familyId = createdFamily._id;
       req.user.save();

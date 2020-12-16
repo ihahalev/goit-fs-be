@@ -269,7 +269,7 @@ transactionSchema.static('getFamilyMonthBalance', async function (familyId) {
       },
     },
   ]);
-  console.log(groupRes);
+  console.log('getFamilyMonthBalance', groupRes);
   if (groupRes.length) {
     const [{ monthBalance }] = groupRes;
     if (!Number.isInteger(monthBalance)) {

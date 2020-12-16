@@ -169,11 +169,11 @@ class TransactionController {
         //   $gte: new Date('2019-09-01'),
         //   $lt: new Date('2019-10-01'),
         // },
-        familyId: ObjectId('5fad8a031830a3386c356e61'),
+        familyId: ObjectId('5fd0e0ecd6bb64000482b56e'),
         // type: 'EXPENSE',
       });
-      const familyId = ObjectId('5fd0e0ecd6bb64000482b56e');
-      const userId = ObjectId('5fcf8eb9fca83f0004a46926');
+      const familyId = ObjectId('5fd8e5c24ef99b0004a6261d');
+      const userId = ObjectId('5fd8e34d4ef99b0004a6261a');
       await Promise.all(
         transes.map(
           async ({ amount, transactionDate, type, category, comment }) => {
