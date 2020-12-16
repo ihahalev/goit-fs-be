@@ -21,9 +21,10 @@ class FamilyController {
           'user already created family/is a part of family',
         );
       }
-      const sum = req.body.totalSalary + req.body.passiveIncome;
       const available =
-        (sum * (100 - req.body.incomePercentageToSavings)) / 100;
+        ((req.body.totalSalary + req.body.passiveIncome) *
+          (100 - req.body.incomePercentageToSavings)) /
+        100;
       const dailySum = available / daysToMonthEnd();
       console.log('createFamily', dailySum, available);
       const createdFamily = await familyModel.create({
