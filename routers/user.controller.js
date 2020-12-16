@@ -56,8 +56,10 @@ class UserController {
 
       if (email === 'projects@goit.ua' || 'buy.a.flat.2020@gmail.com') {
         const userFamily = await familyModel.findById(familyId);
-        userFamily.giftsForUnpacking = 5;
-        userFamily.save();
+        if (userFamily && userFamily._id) {
+          userFamily.giftsForUnpacking = 5;
+          userFamily.save();
+        }
       }
 
       responseNormalizer(201, res, {
