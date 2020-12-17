@@ -161,6 +161,12 @@ class FamilyController {
     try {
       const { familyId } = req.user;
 
+      transactionModel.updateIncomeAndPercent(
+        familyId,
+        req.body.totalSalary + req.body.passiveIncome,
+        req.body.incomePercentageToSavings,
+      );
+
       const monthBalance = await transactionModel.getFamilyMonthBalance(
         familyId,
       );
@@ -186,12 +192,6 @@ class FamilyController {
         incomePercentageToSavings,
         giftsForUnpacking,
       } = familyToUpdate;
-
-      transactionModel.updateIncomeAndPercent(
-        familyId,
-        totalSalary + passiveIncome,
-        incomePercentageToSavings,
-      );
 
       return responseNormalizer(200, res, {
         info: {
