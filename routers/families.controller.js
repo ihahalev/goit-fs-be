@@ -1,6 +1,11 @@
 const Joi = require('joi');
 const { familyModel, transactionModel } = require('../database/models');
-const { ApiError, errorHandler, getLogger } = require('../helpers');
+const {
+  ApiError,
+  errorHandler,
+  getLogger,
+  expenseLimits,
+} = require('../helpers');
 const responseNormalizer = require('../normalizers/response-normalizer');
 
 const logger = getLogger('FamiliesController');
@@ -16,8 +21,15 @@ class FamilyController {
           'user already created family/is a part of family',
         );
       }
-
-      const createdFamily = await familyModel.create(req.body);
+      const numSum =
+        Number(req.body.totalSalary) + Number(req.body.passiveIncome);
+      const { dayLimit, monthLimit } = expenseLimits(req.body, numSum);
+      console.log('createFamily', dayLimit, monthLimit);
+      const createdFamily = await familyModel.create({
+        ...req.body,
+        dayLimit,
+        monthLimit,
+      });
 
       req.user.familyId = createdFamily._id;
       req.user.save();
@@ -149,9 +161,19 @@ class FamilyController {
     try {
       const { familyId } = req.user;
 
+      const monthBalance = await transactionModel.getFamilyMonthBalance(
+        familyId,
+      );
+
+      const { dayLimit, monthLimit } = expenseLimits(req.body, monthBalance);
+      console.log('updateFamily', dayLimit, monthLimit);
       const familyToUpdate = await familyModel.findByIdAndUpdate(
         familyId,
-        req.body,
+        {
+          ...req.body,
+          dayLimit,
+          monthLimit,
+        },
         { new: true },
       );
 
@@ -164,6 +186,12 @@ class FamilyController {
         incomePercentageToSavings,
         giftsForUnpacking,
       } = familyToUpdate;
+
+      transactionModel.updateIncomeAndPercent(
+        familyId,
+        totalSalary + passiveIncome,
+        incomePercentageToSavings,
+      );
 
       return responseNormalizer(200, res, {
         info: {

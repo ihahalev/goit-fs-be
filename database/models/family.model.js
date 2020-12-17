@@ -41,9 +41,9 @@ familySchema.method('updateGiftsUnpack', function () {
   };
 });
 
-familySchema.method('getDesiredSavings', function () {
-  const sum = this.totalSalary + this.passiveIncome;
-  return (sum * this.incomePercentageToSavings) / 100;
-});
+// familySchema.method('getDesiredSavings', function () {
+//   const sum = this.totalSalary + this.passiveIncome;
+//   return (sum * this.incomePercentageToSavings) / 100;
+// });
 
 module.exports = mongoose.model('Family', familySchema);

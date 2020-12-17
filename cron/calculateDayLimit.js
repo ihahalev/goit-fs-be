@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const { familyModel, transactionModel } = require('../database/models');
 
-const { getLogger } = require('../helpers');
+const { getLogger, expenseLimits } = require('../helpers');
 const logger = getLogger('calculateDayLimit');
 
 async function main() {
@@ -13,25 +13,17 @@ async function main() {
         allFamilies.map(async (item) => {
           const { _id } = item;
 
-          const date = new Date();
-          const month = date.getMonth();
-          const year = date.getFullYear();
-          const daysPerMonth = new Date(year, month + 1, 0).getDate();
-          const daysToMonthEnd = daysPerMonth - date.getDate() + 1;
-
           const monthBalance = await transactionModel.getFamilyMonthBalance(
             _id,
           );
 
-          const desiredSavings = item.getDesiredSavings();
-          const available = monthBalance - desiredSavings;
-          const dailySum = available / daysToMonthEnd;
+          const { dayLimit, monthLimit } = expenseLimits(item, monthBalance);
 
           await familyModel.findByIdAndUpdate(
             _id,
             {
-              dayLimit: dailySum.toFixed(2),
-              monthLimit: available.toFixed(2),
+              dayLimit,
+              monthLimit,
             },
             { new: true },
           );

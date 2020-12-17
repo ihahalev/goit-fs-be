@@ -6,7 +6,7 @@ const {
 } = mongoose;
 
 const { transactionModel, familyModel } = require('../database/models');
-const { errorHandler, ApiError } = require('../helpers');
+const { errorHandler, ApiError, desiredSavings } = require('../helpers');
 const responseNormalizer = require('../normalizers/response-normalizer');
 
 const {
@@ -42,8 +42,9 @@ class TransactionController {
       const family = await familyModel.findById(familyId);
       if (_id) {
         family.dayLimit -= amount;
-        const incomeSavings = family.getDesiredSavings();
-        family.monthLimit = monthBalance - incomeSavings;
+        // const incomeSavings = desiredSavings.call(family);
+        // family.monthLimit = monthBalance - incomeSavings;
+        family.monthLimit -= amount;
         await family.save();
       }
       return responseNormalizer(201, res, {
@@ -54,8 +55,8 @@ class TransactionController {
         comment,
         transactionDate,
         monthBalance,
-        dayLimit: family.dayLimit.toFixed(2),
-        monthLimit: family.monthLimit.toFixed(2),
+        dayLimit: family.dayLimit,
+        monthLimit: family.monthLimit,
       });
     } catch (e) {
       errorHandler(req, res, e);
@@ -94,8 +95,8 @@ class TransactionController {
       const { dayLimit, monthLimit } = req.family;
       return responseNormalizer(200, res, {
         monthBalance,
-        dayLimit: dayLimit.toFixed(2),
-        monthLimit: monthLimit.toFixed(2),
+        dayLimit,
+        monthLimit,
       });
     } catch (e) {
       errorHandler(req, res, e);
@@ -169,11 +170,11 @@ class TransactionController {
         //   $gte: new Date('2019-09-01'),
         //   $lt: new Date('2019-10-01'),
         // },
-        familyId: ObjectId('5fad8a031830a3386c356e61'),
+        familyId: ObjectId('5fd0e0ecd6bb64000482b56e'),
         // type: 'EXPENSE',
       });
-      const familyId = ObjectId('5fd0e0ecd6bb64000482b56e');
-      const userId = ObjectId('5fcf8eb9fca83f0004a46926');
+      const familyId = ObjectId('5fd8e5c24ef99b0004a6261d');
+      const userId = ObjectId('5fd8e34d4ef99b0004a6261a');
       await Promise.all(
         transes.map(
           async ({ amount, transactionDate, type, category, comment }) => {
