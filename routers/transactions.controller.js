@@ -36,9 +36,9 @@ class TransactionController {
         userId: userId,
         transactionDate: Date.now(),
       });
-      // const monthBalance = await transactionModel.getFamilyMonthBalance(
-      //   familyId,
-      // );
+      const monthBalance = await transactionModel.getFamilyMonthBalance(
+        familyId,
+      );
       const family = await familyModel.findById(familyId);
       if (_id) {
         family.dayLimit -= amount;
