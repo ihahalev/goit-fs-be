@@ -108,7 +108,7 @@ transactionSchema.static(
           },
           incomeAmount: { $sum: '$incomeAmount' },
           expenses: { $sum: '$expenses' },
-          percentAmount: { $last: '$percentAmount' },
+          percentAmount: { $avg: '$percentAmount' },
           // comment: { $addToSet: '$comment' },
         },
       },
@@ -265,7 +265,7 @@ transactionSchema.static('getFamilyMonthBalance', async function (familyId) {
         incomeAmount: { $sum: '$incomeAmount' },
         expenses: { $sum: '$expenses' },
         monthBalance: { $sum: { $subtract: ['$incomeAmount', '$expenses'] } },
-        comment: { $addToSet: '$incomeAmount' },
+        // comment: { $addToSet: '$incomeAmount' },
       },
     },
   ]);
