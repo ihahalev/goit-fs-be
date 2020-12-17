@@ -6,7 +6,7 @@ const {
 } = mongoose;
 
 const { transactionModel, familyModel } = require('../database/models');
-const { errorHandler, ApiError } = require('../helpers');
+const { errorHandler, ApiError, desiredSavings } = require('../helpers');
 const responseNormalizer = require('../normalizers/response-normalizer');
 
 const {
@@ -36,14 +36,15 @@ class TransactionController {
         userId: userId,
         transactionDate: Date.now(),
       });
-      const monthBalance = await transactionModel.getFamilyMonthBalance(
-        familyId,
-      );
+      // const monthBalance = await transactionModel.getFamilyMonthBalance(
+      //   familyId,
+      // );
       const family = await familyModel.findById(familyId);
       if (_id) {
         family.dayLimit -= amount;
-        const incomeSavings = family.getDesiredSavings();
-        family.monthLimit = monthBalance - incomeSavings;
+        // const incomeSavings = desiredSavings.call(family);
+        // family.monthLimit = monthBalance - incomeSavings;
+        family.monthLimit -= amount;
         await family.save();
       }
       return responseNormalizer(201, res, {
@@ -54,8 +55,8 @@ class TransactionController {
         comment,
         transactionDate,
         monthBalance,
-        dayLimit: family.dayLimit.toFixed(2),
-        monthLimit: family.monthLimit.toFixed(2),
+        dayLimit: family.dayLimit,
+        monthLimit: family.monthLimit,
       });
     } catch (e) {
       errorHandler(req, res, e);
@@ -94,8 +95,8 @@ class TransactionController {
       const { dayLimit, monthLimit } = req.family;
       return responseNormalizer(200, res, {
         monthBalance,
-        dayLimit: dayLimit.toFixed(2),
-        monthLimit: monthLimit.toFixed(2),
+        dayLimit,
+        monthLimit,
       });
     } catch (e) {
       errorHandler(req, res, e);

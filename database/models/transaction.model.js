@@ -108,7 +108,7 @@ transactionSchema.static(
           },
           incomeAmount: { $sum: '$incomeAmount' },
           expenses: { $sum: '$expenses' },
-          percentAmount: { $avg: '$percentAmount' },
+          percentAmount: { $last: '$percentAmount' },
           // comment: { $addToSet: '$comment' },
         },
       },

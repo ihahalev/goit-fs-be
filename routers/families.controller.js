@@ -4,7 +4,7 @@ const {
   ApiError,
   errorHandler,
   getLogger,
-  daysToMonthEnd,
+  expenseLimits,
 } = require('../helpers');
 const responseNormalizer = require('../normalizers/response-normalizer');
 
@@ -23,15 +23,12 @@ class FamilyController {
       }
       const numSum =
         Number(req.body.totalSalary) + Number(req.body.passiveIncome);
-      const leftPrcnt = 100 - Number(req.body.incomePercentageToSavings);
-      const available = (numSum * leftPrcnt) / 100;
-      const dailySum = available / daysToMonthEnd();
-      console.log(numSum, leftPrcnt, available, daysToMonthEnd(), dailySum);
-      console.log('createFamily', dailySum, available);
+      const { dayLimit, monthLimit } = expenseLimits(req.body, numSum);
+      console.log('createFamily', dayLimit, monthLimit);
       const createdFamily = await familyModel.create({
         ...req.body,
-        dayLimit: dailySum.toFixed(2),
-        monthLimit: available.toFixed(2),
+        dayLimit,
+        monthLimit,
       });
 
       req.user.familyId = createdFamily._id;
@@ -164,9 +161,19 @@ class FamilyController {
     try {
       const { familyId } = req.user;
 
+      const monthBalance = await transactionModel.getFamilyMonthBalance(
+        familyId,
+      );
+
+      const { dayLimit, monthLimit } = expenseLimits(req.body, monthBalance);
+      console.log('updateFamily', dayLimit, monthLimit);
       const familyToUpdate = await familyModel.findByIdAndUpdate(
         familyId,
-        req.body,
+        {
+          ...req.body,
+          dayLimit,
+          monthLimit,
+        },
         { new: true },
       );
 
