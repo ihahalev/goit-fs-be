@@ -163,8 +163,8 @@ class FamilyController {
 
       transactionModel.updateIncomeAndPercent(
         familyId,
-        req.body.totalSalary + req.body.passiveIncome,
-        req.body.incomePercentageToSavings,
+        Number(req.body.totalSalary) + Number(req.body.passiveIncome),
+        Number(req.body.incomePercentageToSavings),
       );
 
       const monthBalance = await transactionModel.getFamilyMonthBalance(
