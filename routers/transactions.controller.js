@@ -40,12 +40,12 @@ class TransactionController {
         monthBalance,
         expToday,
       } = await transactionModel.getFamilyMonthBalance(familyId);
-      const { dayLimit, monthLimit } = await familyModel.findById(familyId);
+      const family = await familyModel.findById(familyId);
       if (_id) {
-        dayLimit -= expToday;
+        family.dayLimit -= expToday;
         // const incomeSavings = desiredSavings.call(family);
         // family.monthLimit = monthBalance - incomeSavings;
-        monthLimit -= expToday;
+        family.monthLimit -= expToday;
         // await family.save();
       }
       return responseNormalizer(201, res, {
@@ -56,8 +56,8 @@ class TransactionController {
         comment,
         transactionDate,
         monthBalance,
-        dayLimit,
-        monthLimit,
+        dayLimit: family.dayLimit,
+        monthLimit: family.monthLimit,
       });
     } catch (e) {
       errorHandler(req, res, e);
