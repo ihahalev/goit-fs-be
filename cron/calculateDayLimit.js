@@ -13,7 +13,7 @@ async function main() {
         allFamilies.map(async (item) => {
           const { _id } = item;
 
-          const monthBalance = await transactionModel.getFamilyMonthBalance(
+          const { monthBalance } = await transactionModel.getFamilyMonthBalance(
             _id,
           );
 
