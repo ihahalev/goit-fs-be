@@ -6,7 +6,7 @@ const logger = getLogger('calculateDayLimit');
 
 async function main() {
   try {
-    await cron.schedule('0 0 * * *', async function () {
+    await cron.schedule('5 0 * * *', async function () {
       const allFamilies = await familyModel.find({});
 
       await Promise.all(
@@ -31,7 +31,7 @@ async function main() {
       );
 
       logger.info(
-        `FamilyModel update  dailyLimit and monthLimit every day of (00:00)`,
+        `FamilyModel update  dailyLimit and monthLimit every day of (00:05)`,
       );
     });
   } catch (err) {
