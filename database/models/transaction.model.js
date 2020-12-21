@@ -236,6 +236,7 @@ transactionSchema.static('getFamilyMonthBalance', async function (familyId) {
   const date = new Date();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const startDate = `${date.getFullYear()}-${month}-01`;
+  const today = `${date.getFullYear()}-${month}-${date.getDate()}`;
   const groupRes = await this.aggregate([
     {
       $match: {
@@ -243,41 +244,111 @@ transactionSchema.static('getFamilyMonthBalance', async function (familyId) {
       },
     },
     {
-      $match: {
-        transactionDate: { $gte: new Date(startDate) },
-      },
-    },
-    {
-      $addFields: {
-        transactionDate: '$transactionDate',
-        amount: { $ifNull: ['$amount', 0] },
-        incomeAmount: {
-          $cond: [{ $eq: ['$type', 'INCOME'] }, '$amount', 0],
-        },
-        expenses: {
-          $cond: [{ $eq: ['$type', 'EXPENSE'] }, '$amount', 0],
-        },
-      },
-    },
-    {
-      $group: {
-        _id: null,
-        incomeAmount: { $sum: '$incomeAmount' },
-        expenses: { $sum: '$expenses' },
-        monthBalance: { $sum: { $subtract: ['$incomeAmount', '$expenses'] } },
-        // comment: { $addToSet: '$incomeAmount' },
+      $facet: {
+        monthIncome: [
+          {
+            $match: {
+              transactionDate: { $gte: new Date(startDate) },
+            },
+          },
+          {
+            $addFields: {
+              amount: { $ifNull: ['$amount', 0] },
+              incomeAmount: {
+                $cond: [{ $eq: ['$type', 'INCOME'] }, '$amount', 0],
+              },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              income: { $sum: '$incomeAmount' },
+            },
+          },
+        ],
+        monthExpense: [
+          {
+            $match: {
+              transactionDate: {
+                $gte: new Date(startDate),
+                $lt: new Date(today),
+              },
+            },
+          },
+          {
+            $addFields: {
+              amount: { $ifNull: ['$amount', 0] },
+              expenses: {
+                $cond: [{ $eq: ['$type', 'EXPENSE'] }, '$amount', 0],
+              },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              expenses: { $sum: '$expenses' },
+            },
+          },
+        ],
+        todayExpense: [
+          {
+            $match: {
+              transactionDate: { $gte: new Date(today) },
+            },
+          },
+          {
+            $addFields: {
+              amount: { $ifNull: ['$amount', 0] },
+              expenses: {
+                $cond: [{ $eq: ['$type', 'EXPENSE'] }, '$amount', 0],
+              },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              expToday: { $sum: '$expenses' },
+            },
+          },
+        ],
       },
     },
   ]);
-  console.log('getFamilyMonthBalance', groupRes);
+
   if (groupRes.length) {
-    const [{ monthBalance }] = groupRes;
-    if (!Number.isInteger(monthBalance)) {
-      return 0;
+    const [{ monthIncome, monthExpense, todayExpense }] = groupRes;
+    console.log(
+      'getFamilyMonthBalance groupRes',
+      monthIncome,
+      monthExpense,
+      todayExpense,
+    );
+    let income;
+    let expenses;
+    let expToday;
+    if (monthIncome.length) {
+      income = parseFloat(monthIncome[0].income);
+    } else {
+      income = 0;
     }
-    return monthBalance;
+    if (monthExpense.length) {
+      expenses = parseFloat(monthExpense[0].expenses);
+    } else {
+      expenses = 0;
+    }
+    if (todayExpense.length) {
+      expToday = parseFloat(todayExpense[0].expToday);
+    } else {
+      expToday = 0;
+    }
+    console.log('getFamilyMonthBalance', income, expenses, expToday);
+    const monthBalance = income - expenses;
+    return {
+      monthBalance: monthBalance.toFixed(2),
+      expToday: expToday.toFixed(2),
+    };
   } else {
-    return 0;
+    return { monthBalance: 0, expToday: 0 };
   }
 });
 

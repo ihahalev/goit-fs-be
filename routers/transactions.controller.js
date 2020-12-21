@@ -36,17 +36,16 @@ class TransactionController {
         userId: userId,
         transactionDate: Date.now(),
       });
-      const monthBalance = await transactionModel.getFamilyMonthBalance(
-        familyId,
-      );
+      const {
+        monthBalance,
+        expToday,
+      } = await transactionModel.getFamilyMonthBalance(familyId);
       const family = await familyModel.findById(familyId);
-      if (_id) {
-        family.dayLimit -= amount;
-        // const incomeSavings = desiredSavings.call(family);
-        // family.monthLimit = monthBalance - incomeSavings;
-        family.monthLimit -= amount;
-        await family.save();
-      }
+      console.log(
+        'createTransaction',
+        family.dayLimit - expToday,
+        family.monthLimit - expToday,
+      );
       return responseNormalizer(201, res, {
         _id,
         amount,
@@ -54,9 +53,9 @@ class TransactionController {
         category: dbCategory,
         comment,
         transactionDate,
-        monthBalance,
-        dayLimit: family.dayLimit,
-        monthLimit: family.monthLimit,
+        monthBalance: monthBalance - expToday,
+        dayLimit: family.dayLimit - expToday,
+        monthLimit: family.monthLimit - expToday,
       });
     } catch (e) {
       errorHandler(req, res, e);
@@ -89,14 +88,15 @@ class TransactionController {
   async getCurrentMonth(req, res) {
     try {
       const { familyId } = req.user;
-      const monthBalance = await transactionModel.getFamilyMonthBalance(
-        familyId,
-      );
+      const {
+        monthBalance,
+        expToday,
+      } = await transactionModel.getFamilyMonthBalance(familyId);
       const { dayLimit, monthLimit } = req.family;
       return responseNormalizer(200, res, {
-        monthBalance,
-        dayLimit,
-        monthLimit,
+        monthBalance: monthBalance - expToday,
+        dayLimit: dayLimit - expToday,
+        monthLimit: monthLimit - expToday,
       });
     } catch (e) {
       errorHandler(req, res, e);
@@ -127,7 +127,7 @@ class TransactionController {
   validateTransactionObject(req, res, next) {
     try {
       const { error: validationError } = Joi.object({
-        amount: Joi.number().positive().integer().required(),
+        amount: Joi.number().positive().required(),
         type: Joi.string().valid(...transactionTypes),
         category: Joi.alternatives().try(
           Joi.string().valid(...transactionCategories),
