@@ -317,36 +317,36 @@ transactionSchema.static('getFamilyMonthBalance', async function (familyId) {
 
   if (groupRes.length) {
     const [{ monthIncome, monthExpense, todayExpense }] = groupRes;
+    console.log(
+      'getFamilyMonthBalance groupRes',
+      monthIncome,
+      monthExpense,
+      todayExpense,
+    );
     let income;
     let expenses;
     let expToday;
     if (monthIncome.length) {
-      income = monthIncome[0].income;
-      if (!Number.isInteger(income)) {
-        income = 0;
-      }
+      income = parseFloat(monthIncome[0].income);
     } else {
       income = 0;
     }
     if (monthExpense.length) {
-      expenses = monthExpense[0].expenses;
-      if (!Number.isInteger(expenses)) {
-        expenses = 0;
-      }
+      expenses = parseFloat(monthExpense[0].expenses);
     } else {
       expenses = 0;
     }
     if (todayExpense.length) {
-      expToday = todayExpense[0].expToday;
-      if (!Number.isInteger(expToday)) {
-        expToday = 0;
-      }
+      expToday = parseFloat(todayExpense[0].expToday);
     } else {
       expToday = 0;
     }
     console.log('getFamilyMonthBalance', income, expenses, expToday);
     const monthBalance = income - expenses;
-    return { monthBalance, expToday };
+    return {
+      monthBalance: monthBalance.toFixed(2),
+      expToday: expToday.toFixed(2),
+    };
   } else {
     return { monthBalance: 0, expToday: 0 };
   }

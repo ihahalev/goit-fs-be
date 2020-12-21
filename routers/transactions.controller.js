@@ -41,13 +41,11 @@ class TransactionController {
         expToday,
       } = await transactionModel.getFamilyMonthBalance(familyId);
       const family = await familyModel.findById(familyId);
-      if (_id) {
-        family.dayLimit -= expToday;
-        // const incomeSavings = desiredSavings.call(family);
-        // family.monthLimit = monthBalance - incomeSavings;
-        family.monthLimit -= expToday;
-        // await family.save();
-      }
+      console.log(
+        'createTransaction',
+        family.dayLimit - expToday,
+        family.monthLimit - expToday,
+      );
       return responseNormalizer(201, res, {
         _id,
         amount,
@@ -55,9 +53,9 @@ class TransactionController {
         category: dbCategory,
         comment,
         transactionDate,
-        monthBalance,
-        dayLimit: family.dayLimit,
-        monthLimit: family.monthLimit,
+        monthBalance: monthBalance - expToday,
+        dayLimit: family.dayLimit - expToday,
+        monthLimit: family.monthLimit - expToday,
       });
     } catch (e) {
       errorHandler(req, res, e);
@@ -129,7 +127,7 @@ class TransactionController {
   validateTransactionObject(req, res, next) {
     try {
       const { error: validationError } = Joi.object({
-        amount: Joi.number().positive().integer().required(),
+        amount: Joi.number().positive().required(),
         type: Joi.string().valid(...transactionTypes),
         category: Joi.alternatives().try(
           Joi.string().valid(...transactionCategories),
