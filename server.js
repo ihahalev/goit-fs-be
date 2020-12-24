@@ -7,6 +7,7 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 const configEnv = require('./config.env');
 const {
+  basicRouter,
   usersRouter,
   familiesRouter,
   giftsRouter,
@@ -79,6 +80,7 @@ module.exports = class Server {
 
   initRoutes() {
     this.server.use('/', express.static(path.join(__dirname, 'public')));
+    this.server.use('/', basicRouter);
     this.server.use('/api/users', usersRouter);
     this.server.use('/api/transactions', transactionsRouter);
     this.server.use('/api/families', familiesRouter);
